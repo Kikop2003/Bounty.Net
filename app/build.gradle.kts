@@ -40,20 +40,6 @@ android {
 }
 
 dependencies {
-    val navVersion = "2.8.4"
-
-    // Views/Fragments integration
-    implementation("androidx.navigation:navigation-fragment:$navVersion")
-    implementation("androidx.navigation:navigation-ui:$navVersion")
-
-    // Feature module support for Fragments
-    implementation("androidx.navigation:navigation-dynamic-features-fragment:$navVersion")
-
-    // Testing Navigation
-    androidTestImplementation("androidx.navigation:navigation-testing:$navVersion")
-
-    // JSON serialization library, works with the Kotlin serialization plugin
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
