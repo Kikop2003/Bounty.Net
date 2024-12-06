@@ -23,10 +23,8 @@ import androidx.compose.ui.unit.dp
 import com.example.bountynet.FirebaseHelper
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Switch
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TextFieldDefaults.colors
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
@@ -202,7 +200,7 @@ fun HomePage(modifier: Modifier = Modifier) {
             ),
             shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp) // Rounded corners
         ) {
-            androidx.compose.foundation.layout.Column(
+            Column(
                 modifier = Modifier
                     .padding(12.dp)
             ) {

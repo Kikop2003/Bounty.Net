@@ -1,6 +1,5 @@
 package com.example.bountynet.pages
 
-import com.google.firebase.database.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
