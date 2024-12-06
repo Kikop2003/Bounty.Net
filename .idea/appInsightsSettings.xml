@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.example.bountynet" />
+                  <option name="mobileSdkAppId" value="1:816151793775:android:9ea5fb888037afb6117d9a" />
+                  <option name="projectId" value="bounty-net" />
+                  <option name="projectNumber" value="816151793775" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

@@ -26,7 +26,7 @@ import com.example.bountynet.pages.HomePage
 import com.example.bountynet.pages.Profile
 
 @Composable
-fun MainScreen(modifier: Modifier = Modifier) {
+fun MainScreen(modifier: Modifier = Modifier,userViewModel: UserViewModel) {
 
     val navItems = listOf(
         NavItem("Home",Icons.Default.Home),

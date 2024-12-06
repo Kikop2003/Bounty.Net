@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "816151793775",
+    "firebase_url": "https://bounty-net-default-rtdb.firebaseio.com",
+    "project_id": "bounty-net",
+    "storage_bucket": "bounty-net.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:816151793775:android:9ea5fb888037afb6117d9a",
+        "android_client_info": {
+          "package_name": "com.example.bountynet"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAc-il01LMwUWXDk4vpOOaMg7qoj7Vu83I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
