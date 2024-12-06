@@ -20,13 +20,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.navigation.NavHostController
 import com.example.bountynet.pages.Base
 import com.example.bountynet.pages.Current
 import com.example.bountynet.pages.HomePage
 import com.example.bountynet.pages.Profile
 
 @Composable
-fun MainScreen(modifier: Modifier = Modifier,userViewModel: UserViewModel) {
+fun MainScreen(modifier: Modifier = Modifier,userViewModel: UserViewModel, navController: NavHostController) {
 
     val navItems = listOf(
         NavItem("Home",Icons.Default.Home),

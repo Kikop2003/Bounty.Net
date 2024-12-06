@@ -15,6 +15,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
 import androidx.compose.material3.TextFieldDefaults.colors
+import com.example.bountynet.FirebaseHelper
 
 
 @Composable
@@ -27,7 +28,7 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit) {
     var isUsernameError by remember { mutableStateOf(false) }
     var isPasswordError by remember { mutableStateOf(false) }
 
-    val firebaseHelper = remember { FirebaseHelper() }
+    val firebaseHelper = FirebaseHelper
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -161,42 +162,6 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit) {
     }
 }
 
-class FirebaseHelper {
 
-    private val database: DatabaseReference = FirebaseDatabase.getInstance().reference
-
-    fun checkAndCreateUser(
-        username: String,
-        password: String,
-        onSuccess: (String) -> Unit,
-        onFailure: (String) -> Unit
-    ) {
-        val userRef = database.child("users").child(username)
-        userRef.get().addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val dataSnapshot = task.result
-                if (dataSnapshot.exists()) {
-                    val existingPassword = dataSnapshot.child("password").value as? String
-                    if (existingPassword == password) {
-                        onSuccess(username)
-                    } else {
-                        onFailure("Invalid password")
-                    }
-                } else {
-                    val newUser = mapOf("password" to password)
-                    userRef.setValue(newUser).addOnCompleteListener { createTask ->
-                        if (createTask.isSuccessful) {
-                            onSuccess(username)
-                        } else {
-                            onFailure("Failed to create user")
-                        }
-                    }
-                }
-            } else {
-                onFailure("Database error: ${task.exception?.message}")
-            }
-        }
-    }
-}
 
 

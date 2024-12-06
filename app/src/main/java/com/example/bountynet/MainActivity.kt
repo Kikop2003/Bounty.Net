@@ -44,7 +44,8 @@ fun AppNavigation(userViewModel: UserViewModel) {
         }
         composable("home") {
             MainScreen(
-                userViewModel = userViewModel
+                userViewModel = userViewModel,
+                navController = navController
             )
         }
     }
