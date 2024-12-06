@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -28,6 +29,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults.colors
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.text.capitalize
 import com.example.bountynet.Bounty
 
 @Composable
@@ -115,15 +117,12 @@ fun HomePage(modifier: Modifier = Modifier) {
                             .padding(horizontal = 16.dp, vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        TextButton(
-                            onClick = { isSortDialogOpen = true }
-                        ) {
-                            Text("Sort By")
+                        TextButton(onClick = { isSortDialogOpen = true }) {
+                            Text("Sort By ${sortProperty.replaceFirstChar { char -> char.uppercase() }}")
                         }
                         Spacer(modifier = Modifier.weight(1f))
-                        TextButton(
-                            onClick = { sortAscending = !sortAscending }
-                        ) {
+                        Spacer(modifier = Modifier.width(8.dp))
+                        TextButton(onClick = { sortAscending = !sortAscending }) {
                             Text(if (sortAscending) "Ascending" else "Descending")
                         }
                     }
@@ -145,24 +144,59 @@ fun HomePage(modifier: Modifier = Modifier) {
                     }
                 }
 
-                // Sort Dialog
                 if (isSortDialogOpen) {
                     AlertDialog(
                         onDismissRequest = { isSortDialogOpen = false },
                         title = { Text("Sort By") },
                         text = {
                             Column {
-                                TextButton(onClick = {
-                                    sortProperty = "name"
-                                    isSortDialogOpen = false
-                                }) {
-                                    Text("Name")
+                                // Name Option
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            sortProperty = "name"
+                                            isSortDialogOpen = false
+                                        }
+                                        .padding(vertical = 8.dp)
+                                ) {
+                                    Text(
+                                        text = "Name",
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                    androidx.compose.material3.RadioButton(
+                                        selected = sortProperty == "name",
+                                        onClick = {
+                                            sortProperty = "name"
+                                            isSortDialogOpen = false
+                                        }
+                                    )
                                 }
-                                TextButton(onClick = {
-                                    sortProperty = "reward"
-                                    isSortDialogOpen = false
-                                }) {
-                                    Text("Reward")
+                                // Reward Option
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            sortProperty = "reward"
+                                            isSortDialogOpen = false
+                                        }
+                                        .padding(vertical = 8.dp)
+                                ) {
+                                    Text(
+                                        text = "Reward",
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                    androidx.compose.material3.RadioButton(
+                                        selected = sortProperty == "reward",
+                                        onClick = {
+                                            sortProperty = "reward"
+                                            isSortDialogOpen = false
+                                        }
+                                    )
                                 }
                             }
                         },
@@ -174,13 +208,11 @@ fun HomePage(modifier: Modifier = Modifier) {
                         }
                     )
                 }
+
             }
         }
     }
 }
-
-
-
 
 
     @Composable
