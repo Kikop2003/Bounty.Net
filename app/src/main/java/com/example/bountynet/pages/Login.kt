@@ -126,8 +126,10 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit) {
             Button(
                 onClick = {
                     // Validate input
-                    val isUsernameEmpty = username.trim().isEmpty()
-                    val isPasswordEmpty = password.trim().isEmpty()
+                    username = username.trim()
+                    password = password.trim()
+                    val isUsernameEmpty = username.isEmpty()
+                    val isPasswordEmpty = password.isEmpty()
 
                     isUsernameError = isUsernameEmpty
                     isPasswordError = isPasswordEmpty
