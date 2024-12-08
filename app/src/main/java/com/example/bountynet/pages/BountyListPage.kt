@@ -1,39 +1,18 @@
 package com.example.bountynet.pages
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.bountynet.FirebaseHelper
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults.colors
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.getValue
 import androidx.navigation.NavHostController
 import com.example.bountynet.Bounty
+import com.example.bountynet.FirebaseHelper
 import com.google.gson.Gson
-
 
 @Composable
 fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostController) {
@@ -42,9 +21,12 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var searchText by remember { mutableStateOf("") }
     var isSortDialogOpen by remember { mutableStateOf(false) }
+    var isFilterDialogOpen by remember { mutableStateOf(false) }
     var sortAscending by remember { mutableStateOf(true) }
-    var sortProperty by remember { mutableStateOf("name") } // Default sort property
+    var sortProperty by remember { mutableStateOf("name") }
+    var filterList by remember { mutableStateOf<List<String>>(Bounty.possiblePlanets) }
 
+    // Load items from Firebase
     LaunchedEffect(Unit) {
         FirebaseHelper.retrieveList(
             path = "bountys",
@@ -60,15 +42,17 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
         )
     }
 
-    val filteredAndSortedItems = remember(items, searchText, sortAscending, sortProperty) {
+    val filteredAndSortedItems = remember(items, searchText, sortAscending, sortProperty, filterList) {
         val filtered = if (searchText.isNotEmpty()) {
-            items.filter { it.name.contains(searchText, ignoreCase = true) == true }
+            items.filter {
+                it.name.contains(searchText, ignoreCase = true) && filterList.contains(it.planeta)
+            }
         } else {
-            items
+            items.filter { filterList.contains(it.planeta) }
         }
 
         if (sortProperty == "name") {
-            if (sortAscending) filtered.sortedBy { it.name } else filtered.sortedByDescending { it.name }
+            if (sortAscending) filtered.sortedBy { it.name.lowercase() } else filtered.sortedByDescending { it.name.lowercase() }
         } else {
             if (sortAscending) filtered.sortedBy { it.reward } else filtered.sortedByDescending { it.reward }
         }
@@ -102,7 +86,7 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
                             .fillMaxWidth()
                             .padding(16.dp),
                         singleLine = true,
-                        colors = colors(
+                        colors = TextFieldDefaults.colors(
                             focusedContainerColor = MaterialTheme.colorScheme.surface,
                             unfocusedContainerColor = MaterialTheme.colorScheme.surface,
                             focusedIndicatorColor = MaterialTheme.colorScheme.primary,
@@ -112,7 +96,7 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
                         )
                     )
 
-                    // Sort Options
+                    // Filter and Sort Options
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -120,10 +104,12 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         TextButton(onClick = { isSortDialogOpen = true }) {
-                            Text("Sort By ${sortProperty.replaceFirstChar { char -> char.uppercase() }}")
+                            Text("Sort By ${sortProperty.replaceFirstChar { it.uppercase() }}")
                         }
                         Spacer(modifier = Modifier.weight(1f))
-                        Spacer(modifier = Modifier.width(8.dp))
+                        TextButton(onClick = { isFilterDialogOpen = true }) {
+                            Text("Filter by Planet")
+                        }
                         TextButton(onClick = { sortAscending = !sortAscending }) {
                             Text(if (sortAscending) "Ascending" else "Descending")
                         }
@@ -132,8 +118,8 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
                     // LazyColumn for items
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
-                        verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         items(filteredAndSortedItems) { bounty ->
                             BountyItem(
@@ -159,8 +145,29 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
                 ) {
                     Text(
                         text = "+",
-                        style = MaterialTheme.typography.headlineLarge, // Use a larger predefined text style
-                        color = MaterialTheme.colorScheme.onPrimary // Ensure color matches the FAB content
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
+
+                // Show dialogs
+                if (isSortDialogOpen) {
+                    SortDialog(
+                        currentSortProperty = sortProperty,
+                        currentSortAscending = sortAscending,
+                        onDismiss = { isSortDialogOpen = false },
+                        onApply = { property, ascending ->
+                            sortProperty = property
+                            sortAscending = ascending
+                        }
+                    )
+                }
+
+                if (isFilterDialogOpen) {
+                    FilterDialog(
+                        filterList = filterList,
+                        onFilterChange = { updatedList -> filterList = updatedList.toMutableList() },
+                        onDismiss = { isFilterDialogOpen = false }
                     )
                 }
             }
@@ -168,46 +175,135 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
     }
 }
 
-
-
-
 @Composable
-    fun BountyItem(
-        bounty: Bounty,
-        onClick: (Bounty) -> Unit,
-        modifier: Modifier = Modifier
-    ) {
-        Card(
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 0.dp)
-                .clickable { onClick(bounty) }, // Handle click
-            elevation = androidx.compose.material3.CardDefaults.cardElevation(8.dp), // Higher elevation for "pop-out" effect
-            colors = androidx.compose.material3.CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            ),
-            shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp) // Rounded corners
-        ) {
-            Column(
-                modifier = Modifier
-                    .padding(12.dp)
-            ) {
-                Text(
-                    text = bounty.name,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "Reward: ${bounty.reward} coins",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
+fun SortDialog(
+    currentSortProperty: String,
+    currentSortAscending: Boolean,
+    onDismiss: () -> Unit,
+    onApply: (String, Boolean) -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            Button(onClick = onDismiss) {
+                Text("OK")
+            }
+        },
+        title = { Text("Sort Options") },
+        text = {
+            Column {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp).clickable { onApply("name", currentSortAscending) }
+                ) {
+                    RadioButton(
+                        selected = currentSortProperty == "name",
+                        onClick = { onApply("name", currentSortAscending) }
+                    )
+                    Text("Sort by Name")
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp).clickable { onApply("reward", currentSortAscending) }
+                ) {
+                    RadioButton(
+                        selected = currentSortProperty == "reward",
+                        onClick = { onApply("reward", currentSortAscending) }
+                    )
+                    Text("Sort by Reward")
+                }
             }
         }
+    )
+}
+
+@Composable
+fun FilterDialog(
+    filterList: List<String>,
+    onFilterChange: (List<String>) -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            Button(onClick = onDismiss) {
+                Text("Apply")
+            }
+        },
+        title = { Text("Filter by Planet") },
+        text = {
+            LazyColumn {
+                items(Bounty.possiblePlanets) { planet ->
+                    val isSelected = filterList.contains(planet)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                            .clickable {
+                                val updatedList = if (isSelected) {
+                                    filterList.toMutableList().apply { remove(planet) }
+                                } else {
+                                    filterList.toMutableList().apply { add(planet) }
+                                }
+                                onFilterChange(updatedList)
+                            }
+                    ) {
+                        Checkbox(
+                            checked = isSelected,
+                            onCheckedChange = { checked ->
+                                val updatedList = if (checked) {
+                                    filterList.toMutableList().apply { add(planet) }
+                                } else {
+                                    filterList.toMutableList().apply { remove(planet) }
+                                }
+                                onFilterChange(updatedList)
+                            }
+                        )
+                        Text(
+                            text = planet,
+                            style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
+                    }
+                }
+            }
+        }
+    )
+}
+
+@Composable
+fun BountyItem(
+    bounty: Bounty,
+    onClick: (Bounty) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp, vertical = 0.dp)
+            .clickable { onClick(bounty) },
+        elevation = CardDefaults.cardElevation(8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(12.dp)
+        ) {
+            Text(
+                text = bounty.name,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Reward: ${bounty.reward} coins",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
     }
-
-
-
-
-
+}
