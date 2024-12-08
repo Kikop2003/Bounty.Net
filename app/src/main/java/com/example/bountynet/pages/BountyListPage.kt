@@ -68,7 +68,7 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
         }
 
         if (sortProperty == "name") {
-            if (sortAscending) filtered.sortedBy { it.name } else filtered.sortedByDescending { it.name }
+            if (sortAscending) filtered.sortedBy { it.name.lowercase() } else filtered.sortedByDescending { it.name.lowercase() }
         } else {
             if (sortAscending) filtered.sortedBy { it.reward } else filtered.sortedByDescending { it.reward }
         }
