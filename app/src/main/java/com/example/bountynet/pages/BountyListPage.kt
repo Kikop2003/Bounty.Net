@@ -23,7 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.bountynet.FirebaseHelper
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults.colors
@@ -61,12 +62,11 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
 
     val filteredAndSortedItems = remember(items, searchText, sortAscending, sortProperty) {
         val filtered = if (searchText.isNotEmpty()) {
-            items.filter { it.name?.contains(searchText, ignoreCase = true) == true }
+            items.filter { it.name.contains(searchText, ignoreCase = true) == true }
         } else {
             items
         }
 
-        // Apply sorting
         if (sortProperty == "name") {
             if (sortAscending) filtered.sortedBy { it.name } else filtered.sortedByDescending { it.name }
         } else {
@@ -149,84 +149,35 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
                     }
                 }
 
-                if (isSortDialogOpen) {
-                    AlertDialog(
-                        onDismissRequest = { isSortDialogOpen = false },
-                        title = { Text("Sort By") },
-                        text = {
-                            Column {
-                                // Name Option
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable {
-                                            sortProperty = "name"
-                                            isSortDialogOpen = false
-                                        }
-                                        .padding(vertical = 8.dp)
-                                ) {
-                                    Text(
-                                        text = "Name",
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                    androidx.compose.material3.RadioButton(
-                                        selected = sortProperty == "name",
-                                        onClick = {
-                                            sortProperty = "name"
-                                            isSortDialogOpen = false
-                                        }
-                                    )
-                                }
-                                // Reward Option
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clickable {
-                                            sortProperty = "reward"
-                                            isSortDialogOpen = false
-                                        }
-                                        .padding(vertical = 8.dp)
-                                ) {
-                                    Text(
-                                        text = "Reward",
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                    androidx.compose.material3.RadioButton(
-                                        selected = sortProperty == "reward",
-                                        onClick = {
-                                            sortProperty = "reward"
-                                            isSortDialogOpen = false
-                                        }
-                                    )
-                                }
-                            }
-                        },
-                        confirmButton = {},
-                        dismissButton = {
-                            TextButton(onClick = { isSortDialogOpen = false }) {
-                                Text("Cancel")
-                            }
-                        }
+                FloatingActionButton(
+                    onClick = { navHostController.navigate("createBounty") },
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(16.dp),
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ) {
+                    Text(
+                        text = "+",
+                        style = MaterialTheme.typography.headlineLarge, // Use a larger predefined text style
+                        color = MaterialTheme.colorScheme.onPrimary // Ensure color matches the FAB content
                     )
                 }
-
             }
         }
     }
 }
 
 
-    @Composable
+
+
+@Composable
     fun BountyItem(
         bounty: Bounty,
         onClick: (Bounty) -> Unit,
         modifier: Modifier = Modifier
     ) {
-        androidx.compose.material3.Card(
+        Card(
             modifier = modifier
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp, vertical = 0.dp)
@@ -242,7 +193,7 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
                     .padding(12.dp)
             ) {
                 Text(
-                    text = bounty.name ?: "Unnamed Bounty",
+                    text = bounty.name,
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.primary
                 )

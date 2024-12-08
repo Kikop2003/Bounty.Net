@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.bountynet.pages.BountyDetailPage
+import com.example.bountynet.pages.CreateBountyPage
 import com.example.bountynet.pages.LoginScreen
 import com.example.bountynet.ui.theme.BountyNetTheme
 import com.google.firebase.FirebaseApp
@@ -62,6 +63,11 @@ fun AppNavigation(userViewModel: UserViewModel) {
 
             BountyDetailPage(
                 bounty = bounty
+            )
+        }
+        composable("createBounty") {
+            CreateBountyPage(
+                navController = navController
             )
         }
     }

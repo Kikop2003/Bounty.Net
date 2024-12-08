@@ -57,4 +57,18 @@ object FirebaseHelper {
             }
         })
     }
+
+
+        fun <T> addToDatabase(
+            path: String,
+            item: T,
+            onSuccess: () -> Unit,
+            onFailure: (String) -> Unit
+        ) {
+            val dbRef = FirebaseDatabase.getInstance().getReference(path)
+            val newItemRef = dbRef.push() // Generate a new ID
+            newItemRef.setValue(item)
+                .addOnSuccessListener { onSuccess() }
+                .addOnFailureListener { exception -> onFailure(exception.message ?: "Unknown error") }
+        }
 }

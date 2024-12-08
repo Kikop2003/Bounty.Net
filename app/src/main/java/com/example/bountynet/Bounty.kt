@@ -1,11 +1,16 @@
 package com.example.bountynet
 
 data class Bounty(
-    val id: Long = 0,
-    val name: String = "",
-    val reward: Double = 0.0
+    val name: String = "Unnamed Bounty",
+    val reward: Double = 0.0,
+    val concluida: Boolean = false,
+    val tempo: String = "Unfinished",
+    val hunter: String = "Unfinished",
+    val planeta: String = "Not Defined",
+    val createdBy: String = "Undefined",
+
 ) {
-    override fun toString(): String {
-        return "Bounty ID: $id, Name: $name, Reward: $reward"
+    companion object {
+        val possiblePlanets = listOf("Earth", "Mars", "Jupiter", "Venus", "Saturn")
     }
 }
