@@ -29,10 +29,13 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults.colors
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
+import androidx.navigation.NavHostController
 import com.example.bountynet.Bounty
+import com.google.gson.Gson
+
 
 @Composable
-fun HomePage(modifier: Modifier = Modifier) {
+fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostController) {
     var isLoading by remember { mutableStateOf(true) }
     var items by remember { mutableStateOf<List<Bounty>>(emptyList()) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
@@ -132,11 +135,14 @@ fun HomePage(modifier: Modifier = Modifier) {
                         contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
                         verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)
                     ) {
-                        items(filteredAndSortedItems) { item ->
+                        items(filteredAndSortedItems) { bounty ->
                             BountyItem(
-                                bounty = item,
+                                bounty = bounty,
                                 onClick = { clickedItem ->
-                                    println("Clicked on: ${clickedItem.name}")
+                                    val gson = Gson()
+                                    val bountyJson = gson.toJson(bounty)
+
+                                    navHostController.navigate("bountyDetail/$bountyJson")
                                 }
                             )
                         }
