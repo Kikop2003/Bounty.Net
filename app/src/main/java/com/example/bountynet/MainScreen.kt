@@ -27,7 +27,7 @@ import com.example.bountynet.pages.Current
 import com.example.bountynet.pages.Profile
 
 @Composable
-fun MainScreen(modifier: Modifier = Modifier,userViewModel: UserViewModel, navController: NavHostController) {
+fun MainScreen(modifier: Modifier = Modifier,userId: String, navController: NavHostController) {
 
     val navItems = listOf(
         NavItem("List",Icons.Default.AllInbox),
@@ -66,16 +66,16 @@ fun MainScreen(modifier: Modifier = Modifier,userViewModel: UserViewModel, navCo
             }
         }
     ) { innerPadding ->
-        ContentScreen(modifier = Modifier.padding(innerPadding),selectedIndex,navController)
+        ContentScreen(modifier = Modifier.padding(innerPadding),selectedIndex,navController,userId)
     }
 }
 
 @Composable
-fun ContentScreen(modifier: Modifier = Modifier,selectedIndex : Int, navController: NavHostController) {
+fun ContentScreen(modifier: Modifier = Modifier,selectedIndex : Int, navController: NavHostController, userId: String) {
     when (selectedIndex) {
         -1 -> Base(modifier)
         0 -> BountyListPage(modifier,navController)
         1 -> Current(modifier)
-        2 -> Profile(modifier)
+        2 -> Profile(modifier,userId)
     }
 }

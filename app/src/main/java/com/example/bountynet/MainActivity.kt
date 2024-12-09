@@ -3,7 +3,6 @@ package com.example.bountynet
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import androidx.compose.runtime.*
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -11,7 +10,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.bountynet.Objects.Bounty
-import com.example.bountynet.Objects.UserSession
 import com.example.bountynet.pages.BountyDetailPage
 import com.example.bountynet.pages.CreateBountyPage
 import com.example.bountynet.pages.LoginScreen
@@ -20,7 +18,6 @@ import com.google.firebase.FirebaseApp
 import com.google.gson.Gson
 
 class MainActivity : ComponentActivity() {
-    private val userViewModel by viewModels<UserViewModel>() // Create ViewModel instance
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,33 +26,32 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             BountyNetTheme {
-                AppNavigation(userViewModel) // Pass ViewModel down
+                AppNavigation() // Pass ViewModel down
             }
         }
     }
 }
 
 @Composable
-fun AppNavigation(userViewModel: UserViewModel) {
+fun AppNavigation() {
+    var userId = ""
     val navController = rememberNavController()
     val gson = Gson() // Used for serialization and deserialization
 
     NavHost(navController = navController, startDestination = "login") {
         composable("login") {
             LoginScreen(
-                onLoginSuccess = { username ->
-                    userViewModel.logout()
-                    userViewModel.setUsername(username) // Save username in ViewModel
+                onLoginSuccess = { id ->
+                    userId = id
                     navController.navigate("home")
-
-                    UserSession.username = username
+                    println(id)
                 }
             )
         }
         composable("home") {
             MainScreen(
-                userViewModel = userViewModel,
-                navController = navController
+                userId = userId,
+                navController = navController,
             )
         }
         composable(

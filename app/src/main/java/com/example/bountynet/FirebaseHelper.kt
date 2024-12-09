@@ -7,32 +7,42 @@ import com.google.firebase.database.*
 object FirebaseHelper {
     private val database: DatabaseReference = FirebaseDatabase.getInstance().reference
 
+
+
     fun checkAndCreateUser(
         username: String,
         password: String,
         onSuccess: (String) -> Unit,
         onFailure: (String) -> Unit
     ) {
-        val userRef = database.child("users").child(username)
-        userRef.get().addOnCompleteListener { task ->
+        if (username.isEmpty() || password.isEmpty()) {
+            onFailure("Username and password cannot be empty")
+            return
+        }
+        val userRef = database.child("users")
+        // Check if the username already exists
+        userRef.orderByChild("username").equalTo(username).get().addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 val dataSnapshot = task.result
                 if (dataSnapshot.exists()) {
-                    val existingPassword = dataSnapshot.child("password").value as? String
+                    // Username already exists, check password
+                    val userSnapshot = dataSnapshot.children.first()
+                    val existingPassword = userSnapshot.child("password").value as? String
                     if (existingPassword == password) {
-                        onSuccess(username)
+                        // Return the existing user's ID
+                        onSuccess(userSnapshot.key ?: "Unknown ID")
                     } else {
                         onFailure("Invalid password")
                     }
                 } else {
-                    val newUser = mapOf("password" to password)
-                    userRef.setValue(newUser).addOnCompleteListener { createTask ->
-                        if (createTask.isSuccessful) {
-                            onSuccess(username)
-                        } else {
-                            onFailure("Failed to create user")
-                        }
-                    }
+                    // Create a new user with a Firebase-generated ID
+                    val newUser = User(username = username, password = password)
+                    addToDatabase(
+                        path = "users",
+                        item = newUser,
+                        onSuccess = { id -> onSuccess(id) },
+                        onFailure = { error -> onFailure(error) }
+                    )
                 }
             } else {
                 onFailure("Database error: ${task.exception?.message}")
@@ -40,32 +50,9 @@ object FirebaseHelper {
         }
     }
 
-    fun getUser(
-        username: String?,
-        onSuccess: (User?) -> Unit,
-        onFailure: (String) -> Unit
-    ) {
-        if (username == null) {
-            onFailure("Username is null")
-            return
-        }
 
-        val userRef = database.child("users").child(username)
-        userRef.get().addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val dataSnapshot = task.result
-                if (dataSnapshot.exists()) {
-                    // Map the data snapshot to a User object
-                    val user = dataSnapshot.getValue(User::class.java)
-                    onSuccess(user)
-                } else {
-                    onSuccess(null) // User not found
-                }
-            } else {
-                onFailure("Error fetching user: ${task.exception?.message}")
-            }
-        }
-    }
+
+
 
     fun <T : Any> retrieveList(
         path: String,
@@ -89,13 +76,42 @@ object FirebaseHelper {
     fun <T> addToDatabase(
         path: String,
         item: T,
-        onSuccess: () -> Unit,
+        onSuccess: (String) -> Unit,
         onFailure: (String) -> Unit
     ) {
         val dbRef = FirebaseDatabase.getInstance().getReference(path)
         val newItemRef = dbRef.push() // Generate a new ID
         newItemRef.setValue(item)
-            .addOnSuccessListener { onSuccess() }
+            .addOnSuccessListener { onSuccess(newItemRef.key ?: "Unknown ID") }
             .addOnFailureListener { exception -> onFailure(exception.message ?: "Unknown error") }
     }
+
+    fun <T> getObjectById(
+        path: String,
+        id: String,
+        type: Class<T>,
+        onSuccess: (T) -> Unit,
+        onFailure: (String) -> Unit
+    ) {
+        val ref = FirebaseDatabase.getInstance().getReference(path).child(id)
+        ref.get().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val dataSnapshot = task.result
+                if (dataSnapshot.exists()) {
+                    // Convert the snapshot into the object of type T
+                    val obj = dataSnapshot.getValue(type)
+                    if (obj != null) {
+                        onSuccess(obj)
+                    } else {
+                        onFailure("Failed to map data to the object")
+                    }
+                } else {
+                    onFailure("No data found for the given ID")
+                }
+            } else {
+                onFailure("Database error: ${task.exception?.message}")
+            }
+        }
+    }
+
 }
