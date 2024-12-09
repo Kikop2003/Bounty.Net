@@ -17,10 +17,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.TextFieldDefaults.colors
 import androidx.compose.ui.text.input.KeyboardType
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateBountyPage(
     navController: NavHostController,
+    userId : String
 ) {
     var name by remember { mutableStateOf("") }
     var reward by remember { mutableStateOf("") }
@@ -168,7 +168,8 @@ fun CreateBountyPage(
                             val bounty = Bounty(
                                 name = name,
                                 reward = reward.toDoubleOrNull() ?: 0.0,
-                                planeta = selectedPlanet
+                                planeta = selectedPlanet,
+                                createdBy = userId
                             )
                             FirebaseHelper.addToDatabase(
                                 path = "bountys",

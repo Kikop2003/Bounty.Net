@@ -67,7 +67,8 @@ fun AppNavigation() {
         }
         composable("createBounty") {
             CreateBountyPage(
-                navController = navController
+                navController = navController,
+                userId = userId
             )
         }
     }
