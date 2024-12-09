@@ -10,6 +10,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.bountynet.Objects.Bounty
+import com.example.bountynet.Objects.UserSession
 import com.example.bountynet.pages.BountyDetailPage
 import com.example.bountynet.pages.CreateBountyPage
 import com.example.bountynet.pages.LoginScreen
@@ -45,6 +47,8 @@ fun AppNavigation(userViewModel: UserViewModel) {
                     userViewModel.logout()
                     userViewModel.setUsername(username) // Save username in ViewModel
                     navController.navigate("home")
+
+                    UserSession.username = username
                 }
             )
         }

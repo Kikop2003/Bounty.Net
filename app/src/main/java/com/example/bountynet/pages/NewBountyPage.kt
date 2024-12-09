@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
-import com.example.bountynet.Bounty
+import com.example.bountynet.Objects.Bounty
 import com.example.bountynet.FirebaseHelper
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions

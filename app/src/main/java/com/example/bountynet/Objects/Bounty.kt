@@ -1,4 +1,4 @@
-package com.example.bountynet
+package com.example.bountynet.Objects
 
 data class Bounty(
     val name: String = "Unnamed Bounty",

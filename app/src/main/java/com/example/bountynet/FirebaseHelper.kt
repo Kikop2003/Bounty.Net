@@ -1,5 +1,6 @@
 package com.example.bountynet
 
+import com.example.bountynet.Objects.User
 import com.google.firebase.database.*
 
 
@@ -39,6 +40,33 @@ object FirebaseHelper {
         }
     }
 
+    fun getUser(
+        username: String?,
+        onSuccess: (User?) -> Unit,
+        onFailure: (String) -> Unit
+    ) {
+        if (username == null) {
+            onFailure("Username is null")
+            return
+        }
+
+        val userRef = database.child("users").child(username)
+        userRef.get().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val dataSnapshot = task.result
+                if (dataSnapshot.exists()) {
+                    // Map the data snapshot to a User object
+                    val user = dataSnapshot.getValue(User::class.java)
+                    onSuccess(user)
+                } else {
+                    onSuccess(null) // User not found
+                }
+            } else {
+                onFailure("Error fetching user: ${task.exception?.message}")
+            }
+        }
+    }
+
     fun <T : Any> retrieveList(
         path: String,
         type: Class<T>,
@@ -58,17 +86,16 @@ object FirebaseHelper {
         })
     }
 
-
-        fun <T> addToDatabase(
-            path: String,
-            item: T,
-            onSuccess: () -> Unit,
-            onFailure: (String) -> Unit
-        ) {
-            val dbRef = FirebaseDatabase.getInstance().getReference(path)
-            val newItemRef = dbRef.push() // Generate a new ID
-            newItemRef.setValue(item)
-                .addOnSuccessListener { onSuccess() }
-                .addOnFailureListener { exception -> onFailure(exception.message ?: "Unknown error") }
-        }
+    fun <T> addToDatabase(
+        path: String,
+        item: T,
+        onSuccess: () -> Unit,
+        onFailure: (String) -> Unit
+    ) {
+        val dbRef = FirebaseDatabase.getInstance().getReference(path)
+        val newItemRef = dbRef.push() // Generate a new ID
+        newItemRef.setValue(item)
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { exception -> onFailure(exception.message ?: "Unknown error") }
+    }
 }

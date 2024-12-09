@@ -10,7 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.bountynet.Bounty
+import com.example.bountynet.Objects.Bounty
 import com.example.bountynet.FirebaseHelper
 import com.google.gson.Gson
 
