@@ -1,5 +1,6 @@
 package com.example.bountynet.pages
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -7,10 +8,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import com.example.bountynet.FirebaseHelper
 import com.example.bountynet.Objects.Bounty
 
 @Composable
-fun BountyDetailPage(bounty: Bounty) {
+fun BountyDetailPage(pair: Pair<String, Bounty>, navController: NavHostController,userId: String) {
+    val bounty = pair.second
+    val id = pair.first
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
@@ -36,6 +41,30 @@ fun BountyDetailPage(bounty: Bounty) {
             DetailRow(label = "Concluded", value = "Yes")
             DetailRow(label = "Time", value = bounty.tempo)
             DetailRow(label = "Hunter", value = bounty.hunter)
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)
+        ) {
+            Button(onClick = {
+                navController.popBackStack()
+            }) {
+                Text("Cancel")
+            }
+            if(bounty.hunter == "None"){
+                Button(onClick = {
+                    FirebaseHelper.acceptBounty(id, userId, callback = { text->
+                        Toast.makeText(navController.context, text, Toast.LENGTH_SHORT).show()})
+                }) {
+                    Text("Accept")
+                }
+            }
+
         }
 
 

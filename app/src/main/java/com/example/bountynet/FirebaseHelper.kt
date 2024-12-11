@@ -57,13 +57,21 @@ object FirebaseHelper {
     fun <T : Any> retrieveList(
         path: String,
         type: Class<T>,
-        onSuccess: (List<T>) -> Unit,
+        onSuccess: (List<Pair<String, T>>) -> Unit,
         onFailure: (String) -> Unit
     ) {
         val ref = FirebaseDatabase.getInstance().getReference(path)
         ref.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val items = snapshot.children.mapNotNull { it.getValue(type) }
+                val items = snapshot.children.mapNotNull { child ->
+                    val key = child.key // This might be null
+                    val item = child.getValue(type)
+                    if (key != null && item != null) {
+                        key to item // Create a non-nullable pair
+                    } else {
+                        null // Skip this entry if key or item is null
+                    }
+                }
                 onSuccess(items)
             }
 
@@ -72,6 +80,7 @@ object FirebaseHelper {
             }
         })
     }
+
 
     fun <T> addToDatabase(
         path: String,
@@ -113,5 +122,24 @@ object FirebaseHelper {
             }
         }
     }
+    fun acceptBounty(bountyId: String, userId: String, callback: (String) -> Unit) {
+        val refUser = database.child("users").child(userId)
+        refUser.child("currentBountyId").get().addOnSuccessListener { snapshot ->
+            // Get the current bounty ID from the snapshot
+            val currentBountyId = snapshot.getValue(String::class.java)
+
+            if (currentBountyId != "None") {
+                callback("User already has an active bounty")
+                return@addOnSuccessListener
+            }
+
+            val refBounty = database.child("bountys").child(bountyId)
+            refBounty.child("hunter").setValue(userId)
+            refUser.child("currentBountyId").setValue(bountyId)
+
+            callback("Bounty accepted successfully")
+        }
+    }
+
 
 }

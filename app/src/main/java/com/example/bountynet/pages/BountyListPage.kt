@@ -17,7 +17,7 @@ import com.google.gson.Gson
 @Composable
 fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostController) {
     var isLoading by remember { mutableStateOf(true) }
-    var items by remember { mutableStateOf<List<Bounty>>(emptyList()) }
+    var items by remember { mutableStateOf<List<Pair<String, Bounty>>>(emptyList()) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var searchText by remember { mutableStateOf("") }
     var isSortDialogOpen by remember { mutableStateOf(false) }
@@ -45,16 +45,16 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
     val filteredAndSortedItems = remember(items, searchText, sortAscending, sortProperty, filterList) {
         val filtered = if (searchText.isNotEmpty()) {
             items.filter {
-                it.name.contains(searchText, ignoreCase = true) && filterList.contains(it.planeta)
+                it.second.name.contains(searchText, ignoreCase = true) && filterList.contains(it.second.planeta)
             }
         } else {
-            items.filter { filterList.contains(it.planeta) }
+            items.filter { filterList.contains(it.second.planeta) }
         }
 
         if (sortProperty == "name") {
-            if (sortAscending) filtered.sortedBy { it.name.lowercase() } else filtered.sortedByDescending { it.name.lowercase() }
+            if (sortAscending) filtered.sortedBy { it.second.name.lowercase() } else filtered.sortedByDescending { it.second.name.lowercase() }
         } else {
-            if (sortAscending) filtered.sortedBy { it.reward } else filtered.sortedByDescending { it.reward }
+            if (sortAscending) filtered.sortedBy { it.second.reward } else filtered.sortedByDescending { it.second.reward }
         }
     }
 
@@ -121,14 +121,13 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
                         contentPadding = PaddingValues(16.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(filteredAndSortedItems) { bounty ->
+                        items(filteredAndSortedItems) { pair ->
                             BountyItem(
-                                bounty = bounty,
+                                bounty = pair.second,
                                 onClick = { clickedItem ->
                                     val gson = Gson()
-                                    val bountyJson = gson.toJson(bounty)
-
-                                    navHostController.navigate("bountyDetail/$bountyJson")
+                                    val pairJson = gson.toJson(pair)
+                                    navHostController.navigate("bountyDetail/$pairJson")
                                 }
                             )
                         }

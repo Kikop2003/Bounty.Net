@@ -14,6 +14,7 @@ import com.example.bountynet.pages.BountyDetailPage
 import com.example.bountynet.pages.CreateBountyPage
 import com.example.bountynet.pages.LoginScreen
 import com.example.bountynet.ui.theme.BountyNetTheme
+import com.google.common.reflect.TypeToken
 import com.google.firebase.FirebaseApp
 import com.google.gson.Gson
 
@@ -55,14 +56,16 @@ fun AppNavigation() {
             )
         }
         composable(
-            "bountyDetail/{bounty}",
-            arguments = listOf(navArgument("bounty") { type = NavType.StringType })
+            "bountyDetail/{pair}",
+            arguments = listOf(navArgument("pair") { type = NavType.StringType })
         ) { backStackEntry ->
-            val bountyJson = backStackEntry.arguments?.getString("bounty")
-            val bounty = gson.fromJson(bountyJson, Bounty::class.java) // Deserialize JSON to Bounty object
-
+            val pairJson = backStackEntry.arguments?.getString("pair")
+            val pairType = object : TypeToken<Pair<String, Bounty>>() {}.type
+            val pair: Pair<String, Bounty> = gson.fromJson(pairJson, pairType)
             BountyDetailPage(
-                bounty = bounty
+                pair = pair,
+                navController = navController,
+                userId = userId
             )
         }
         composable("createBounty") {
