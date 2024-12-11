@@ -74,63 +74,62 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
                 )
             }
             else -> {
-                Column(
-                    modifier = Modifier.fillMaxSize()
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // Search Bar
-                    TextField(
-                        value = searchText,
-                        onValueChange = { searchText = it },
-                        placeholder = { Text("Search bounties...") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        singleLine = true,
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = MaterialTheme.colorScheme.surface,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                            focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-                            unfocusedIndicatorColor = MaterialTheme.colorScheme.outline,
-                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface
+                    // Header - Search Bar and Sort/Filter Buttons
+                    item {
+                        // Search Bar
+                        TextField(
+                            value = searchText,
+                            onValueChange = { searchText = it },
+                            placeholder = { Text("Search bounties...") },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            singleLine = true,
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                                focusedIndicatorColor = MaterialTheme.colorScheme.primary,
+                                unfocusedIndicatorColor = MaterialTheme.colorScheme.outline,
+                                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                                unfocusedTextColor = MaterialTheme.colorScheme.onSurface
+                            )
                         )
-                    )
 
-                    // Filter and Sort Options
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        TextButton(onClick = { isSortDialogOpen = true }) {
-                            Text("Sort By ${sortProperty.replaceFirstChar { it.uppercase() }}")
-                        }
-                        Spacer(modifier = Modifier.weight(1f))
-                        TextButton(onClick = { isFilterDialogOpen = true }) {
-                            Text("Filter by Planet")
-                        }
-                        TextButton(onClick = { sortAscending = !sortAscending }) {
-                            Text(if (sortAscending) "Ascending" else "Descending")
+                        // Filter and Sort Options
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            TextButton(onClick = { isSortDialogOpen = true }) {
+                                Text("Sort By ${sortProperty.replaceFirstChar { it.uppercase() }}")
+                            }
+                            Spacer(modifier = Modifier.weight(1f))
+                            TextButton(onClick = { isFilterDialogOpen = true }) {
+                                Text("Filter by Planet")
+                            }
+                            TextButton(onClick = { sortAscending = !sortAscending }) {
+                                Text(if (sortAscending) "Ascending" else "Descending")
+                            }
                         }
                     }
 
-                    // LazyColumn for items
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        items(filteredAndSortedItems) { pair ->
-                            BountyItem(
-                                bounty = pair.second,
-                                onClick = { clickedItem ->
-                                    val gson = Gson()
-                                    val pairJson = gson.toJson(pair)
-                                    navHostController.navigate("bountyDetail/$pairJson")
-                                }
-                            )
-                        }
+                    // List of Bounty Items
+                    items(filteredAndSortedItems) { pair ->
+                        BountyItem(
+                            bounty = pair.second,
+                            onClick = { clickedItem ->
+                                val gson = Gson()
+                                val pairJson = gson.toJson(pair)
+                                navHostController.navigate("bountyDetail/$pairJson")
+                            }
+                        )
                     }
                 }
 
@@ -173,6 +172,7 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
         }
     }
 }
+
 
 @Composable
 fun SortDialog(
