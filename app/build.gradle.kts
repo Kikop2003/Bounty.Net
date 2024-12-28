@@ -41,6 +41,10 @@ android {
 }
 
 dependencies {
+    implementation(libs.maps.compose)
+    implementation (libs.google.accompanist.permissions)
+    implementation (libs.play.services.location)
+
     implementation (libs.play.services.maps)
     implementation (libs.google.gson)
     implementation(platform(libs.firebase.bom))
