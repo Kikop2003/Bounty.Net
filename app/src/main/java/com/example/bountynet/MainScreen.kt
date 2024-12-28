@@ -75,7 +75,7 @@ fun ContentScreen(modifier: Modifier = Modifier,selectedIndex : Int, navControll
     when (selectedIndex) {
         -1 -> Base(modifier)
         0 -> BountyListPage(modifier,navController)
-        1 -> Current(modifier,userId)
+        1 -> Current(modifier,userId,navController)
         2 -> Profile(modifier,userId)
     }
 }

@@ -17,6 +17,8 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Looper
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -25,14 +27,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavHostController
 import com.example.bountynet.FirebaseHelper
 import com.example.bountynet.Objects.Bounty
 import com.google.android.gms.location.*
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.maps.android.compose.*
 
 
 @Composable
-fun Current(modifier: Modifier = Modifier, userId: String){
+fun Current(modifier: Modifier = Modifier, userId: String, navHostController: NavHostController){
     val context = LocalContext.current
     var permissionGranted by remember { mutableStateOf(false) }
 
@@ -89,7 +93,7 @@ fun Current(modifier: Modifier = Modifier, userId: String){
         }
         bounty != null -> {
             if (permissionGranted) {
-                GoogleMapsScreen(modifier)
+                GoogleMapsScreen(modifier,navHostController, bounty!!)
             } else {
                 Box(modifier = Modifier.fillMaxSize()) {
                     Text(
@@ -113,11 +117,12 @@ fun Current(modifier: Modifier = Modifier, userId: String){
 
 
 @Composable
-fun GoogleMapsScreen(modifier: Modifier) {
+fun GoogleMapsScreen(modifier: Modifier, navController: NavHostController, bounty: Bounty) {
     val context = LocalContext.current
     val fusedLocationProviderClient = remember {
         LocationServices.getFusedLocationProviderClient(context)
     }
+    Toast.makeText(context, bounty.name, Toast.LENGTH_SHORT).show()
 
     // Set up CameraPositionState
     val cameraPositionState = rememberCameraPositionState {
@@ -126,21 +131,30 @@ fun GoogleMapsScreen(modifier: Modifier) {
 
     val userLocation = remember { mutableStateOf<LatLng?>(null) }
     val destination = LatLng(37.7749, -122.4194) // Example destination
-    var startLocation = remember { mutableStateOf<LatLng?>(null) }
-    // Get the user's current location
+
+    val currentBackStackEntry = navController.currentBackStackEntry
+    val savedLocal = currentBackStackEntry?.savedStateHandle?.get<LatLng?>("startLocation")
+
+    var startLocation = remember { mutableStateOf<LatLng?>(savedLocal)}
+
+
     LaunchedEffect(Unit) {
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             fusedLocationProviderClient.lastLocation.addOnSuccessListener { location: Location? ->
                 location?.let {
+                    Log.d("GoogleMapsScreen", "Location: ${it.latitude}, ${it.longitude}")
                     val latLng = LatLng(it.latitude, it.longitude)
                     userLocation.value = latLng
-                    startLocation.value = latLng
-                    // Move the camera to the user's current location
-                    cameraPositionState.position = CameraPosition.fromLatLngZoom(latLng, 10f)
-                }
+                    if (startLocation.value == null){
+                        navController.currentBackStackEntry?.savedStateHandle?.set("startLocation", latLng)
+                        startLocation.value = latLng
+                    }
+                    cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(latLng, 10f))
+                } ?: Toast.makeText(context, "Remember To turn on location", Toast.LENGTH_SHORT).show()
             }
         }
     }
+
     // Real-time location updates
     val locationRequest = LocationRequest.Builder(Priority.PRIORITY_LOW_POWER, 5000)
         .setMinUpdateIntervalMillis(2000)
@@ -153,6 +167,11 @@ fun GoogleMapsScreen(modifier: Modifier) {
                 val latLng = LatLng(location.latitude, location.longitude)
                 userLocation.value = latLng
                 // Update camera position only if needed
+                if (startLocation.value == null){
+                    navController.currentBackStackEntry?.savedStateHandle?.set("startLocation", latLng)
+                    startLocation.value = latLng
+                    cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(latLng, 10f))
+                }
             }
         }
     }
