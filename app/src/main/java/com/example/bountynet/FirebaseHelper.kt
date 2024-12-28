@@ -2,7 +2,7 @@ package com.example.bountynet
 
 import com.example.bountynet.Objects.User
 import com.google.firebase.database.*
-
+import com.example.bountynet.Objects.Bounty
 
 object FirebaseHelper {
     private val database: DatabaseReference = FirebaseDatabase.getInstance().reference
@@ -53,6 +53,32 @@ object FirebaseHelper {
 
 
 
+    fun getUserBounty(
+        userId: String,
+        onSuccess: (Bounty) -> Unit,
+        onFailure: (String) -> Unit
+    ) {
+        getObjectById(
+            path = "users",
+            id = userId,
+            type = User::class.java,
+            onSuccess = { userRet ->
+                val bountyId = userRet.currentBountyId.toString()
+                if (bountyId != "ERROR") {
+                    getObjectById(
+                        path = "bountys",
+                        id = bountyId,
+                        type = Bounty::class.java,
+                        onSuccess = { bountyRet -> onSuccess(bountyRet) },
+                        onFailure = { error -> onFailure(error) }
+                    )
+                }else{
+                    onFailure("User has no bounty")
+                }
+            },
+            onFailure = { error -> onFailure(error) }
+        )
+    }
 
     fun <T : Any> retrieveList(
         path: String,
@@ -128,7 +154,7 @@ object FirebaseHelper {
             // Get the current bounty ID from the snapshot
             val currentBountyId = snapshot.getValue(String::class.java)
 
-            if (currentBountyId != "None") {
+            if (currentBountyId != "ERROR") {
                 callback("User already has an active bounty")
                 return@addOnSuccessListener
             }

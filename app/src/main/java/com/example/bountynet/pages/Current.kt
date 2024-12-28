@@ -20,16 +20,19 @@ import android.os.Looper
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.core.content.ContextCompat
+import com.example.bountynet.FirebaseHelper
+import com.example.bountynet.Objects.Bounty
 import com.google.android.gms.location.*
 import com.google.maps.android.compose.*
 
 
 @Composable
-fun Current(modifier: Modifier = Modifier){
+fun Current(modifier: Modifier = Modifier, userId: String){
     val context = LocalContext.current
     var permissionGranted by remember { mutableStateOf(false) }
 
@@ -52,20 +55,62 @@ fun Current(modifier: Modifier = Modifier){
             launcher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         }
     }
+    var bounty by remember { mutableStateOf<Bounty?>(null) }
+    var failure by remember { mutableStateOf(false) }
+    var text by remember { mutableStateOf("Loading...") }
+    var isLoading by remember { mutableStateOf(true) } // State for loading
 
-    if (permissionGranted) {
-        GoogleMapsScreen(modifier)
-    }else{
-        Box(modifier = Modifier.fillMaxSize()) {
-            Text(
-                text = "Permission for fine Location not granted",
-                modifier = Modifier.align(Alignment.Center)
-            )
+    // Fetch bounty information
+    LaunchedEffect(userId) {
+        isLoading = true
+        FirebaseHelper.getUserBounty(
+            userId = userId,
+            onSuccess = { ret ->
+                bounty = ret
+                failure = false
+                isLoading = false
+            },
+            onFailure = { ret ->
+                text = ret
+                failure = true
+                isLoading = false
+            }
+        )
+    }
+
+    when {
+        isLoading -> {
+            // Circular Progress Indicator for loading state
+            Box(modifier = Modifier.fillMaxSize()) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
         }
-
+        bounty != null -> {
+            if (permissionGranted) {
+                GoogleMapsScreen(modifier)
+            } else {
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Text(
+                        text = "Permission for fine Location not granted",
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+            }
+        }
+        failure -> {
+            Box(modifier = Modifier.fillMaxSize()) {
+                Text(
+                    text = text,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+        }
     }
 
 }
+
 
 @Composable
 fun GoogleMapsScreen(modifier: Modifier) {

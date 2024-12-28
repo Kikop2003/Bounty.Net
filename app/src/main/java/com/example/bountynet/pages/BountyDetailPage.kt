@@ -54,7 +54,7 @@ fun BountyDetailPage(pair: Pair<String, Bounty>, navController: NavHostControlle
             Button(onClick = {
                 navController.popBackStack()
             }) {
-                Text("Cancel")
+                Text("Go Back")
             }
             if(bounty.hunter == "None"){
                 Button(onClick = {
