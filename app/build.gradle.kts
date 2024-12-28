@@ -41,6 +41,7 @@ android {
 }
 
 dependencies {
+    implementation (libs.play.services.maps)
     implementation (libs.google.gson)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
