@@ -1,5 +1,6 @@
 package com.example.bountynet.pages
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -32,6 +33,8 @@ fun CreateBountyPage(
                 .padding(16.dp)
         ) {
             // Title
+            Spacer(modifier = Modifier.height(16.dp))
+
             Text(
                 text = "Create Bounty",
                 style = MaterialTheme.typography.headlineMedium,
@@ -52,13 +55,16 @@ fun CreateBountyPage(
                 onValueChange = {
                     name = it
                     errorName = false
-                }
+                },
+                keyboardType = KeyboardType.Text
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             var reward by remember { mutableStateOf("") }
             var errorReward by remember { mutableStateOf(false) } // Error message for validation
+            var errorMoney by remember { mutableStateOf(false) } // Error message for validation
+
             ValidatedInput(
                 value = reward,
                 label = "Reward",
@@ -67,7 +73,9 @@ fun CreateBountyPage(
                 onValueChange = {
                     reward = it
                     errorReward = false
-                }
+                    errorMoney = false
+                },
+                keyboardType = KeyboardType.Number
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -125,37 +133,82 @@ fun CreateBountyPage(
                     onClick = {
 
                         val trimmedName = name.trim()
-
-                        val rewardValue = reward.toDoubleOrNull()
+                        val rewardValue = reward.toIntOrNull()
                         val latitudeValue = latitude.toDoubleOrNull()
                         val longitudeValue = longitude.toDoubleOrNull()
 
+                        // Validate inputs
                         errorName = trimmedName.isEmpty()
                         errorReward = rewardValue == null || rewardValue <= 0
                         errorPlanet = selectedPlanet.isEmpty()
                         errorLat = latitudeValue == null || latitudeValue < -90 || latitudeValue > 90
                         errorLon = longitudeValue == null || longitudeValue < -180 || longitudeValue > 180
+                        var creds = 0
 
                         if (!errorName && !errorReward && !errorPlanet && !errorLat && !errorLon) {
-                            val bounty = Bounty(
-                                name = trimmedName,
-                                reward = rewardValue!!,
-                                planeta = selectedPlanet,
-                                createdBy = userId,
-                                lat = latitudeValue!!,
-                                lon = longitudeValue!!
-                            )
-                            FirebaseHelper.addToDatabase(
-                                path = "bountys",
-                                item = bounty,
-                                onSuccess = { navController.popBackStack() },
-                                onFailure = { error -> /* Handle error */ }
+
+                            // Asynchronously get user credentials
+                            FirebaseHelper.getUserCreds(
+                                userId = userId,
+                                onSuccess = { retCreds ->
+
+                                    creds = retCreds
+
+                                    // Check if the user has enough credits
+                                    if (rewardValue!! > creds) {
+                                        errorMoney = true
+                                        Toast.makeText(navController.context, "Not enough credits", Toast.LENGTH_SHORT).show()
+                                    } else {
+                                        // Deduct credits and update them in Firebase
+                                        creds -= rewardValue
+                                        FirebaseHelper.updateObjectAttribute(
+                                            path = "users",
+                                            id = userId,
+                                            attribute = "creds",
+                                            attributeValue = creds,
+                                            onFailure = { text ->
+                                                Toast.makeText(navController.context, text, Toast.LENGTH_SHORT).show()
+                                                errorMoney = true
+                                            }
+                                        )
+
+                                        // After successfully updating credits, create bounty
+                                        if (!errorMoney) {
+                                            val bounty = Bounty(
+                                                name = trimmedName,
+                                                reward = rewardValue,
+                                                planeta = selectedPlanet,
+                                                createdBy = userId,
+                                                lat = latitudeValue!!,
+                                                lon = longitudeValue!!
+                                            )
+
+                                            // Add bounty to the database
+                                            FirebaseHelper.addToDatabase(
+                                                path = "bountys",
+                                                item = bounty,
+                                                onSuccess = {
+                                                    navController.popBackStack()  // Navigate back on success
+                                                },
+                                                onFailure = { error ->
+                                                    // Handle error when adding bounty
+                                                    Toast.makeText(navController.context, "Failed to add bounty", Toast.LENGTH_SHORT).show()
+                                                }
+                                            )
+                                        }
+                                    }
+                                },
+                                onFailure = { error ->
+                                    // Handle error when fetching user credentials
+                                    Toast.makeText(navController.context, "Failed to retrieve user credits", Toast.LENGTH_SHORT).show()
+                                }
                             )
                         }
                     }
                 ) {
                     Text("Create")
                 }
+
             }
         }
     }
@@ -167,18 +220,18 @@ fun ValidatedInput(
     label: String,
     errorText: String,
     isError: Boolean,
-    onValueChange: (String) -> Unit
+    onValueChange: (String) -> Unit,
+    keyboardType: KeyboardType = KeyboardType.Text // Add keyboardType as a parameter
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         OutlinedTextField(
             value = value,
-            onValueChange = { input ->
-                onValueChange(input) // Handle input changes
-            },
+            onValueChange = { input -> onValueChange(input) }, // Handle input changes
             label = { Text(label) },
             singleLine = true,
             isError = isError,
             modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = keyboardType), // Use keyboardType parameter here
             colors = colors(
                 focusedContainerColor = MaterialTheme.colorScheme.surface,
                 unfocusedContainerColor = MaterialTheme.colorScheme.surface,
@@ -198,6 +251,7 @@ fun ValidatedInput(
         }
     }
 }
+
 
 @Composable
 fun LatLongInput(

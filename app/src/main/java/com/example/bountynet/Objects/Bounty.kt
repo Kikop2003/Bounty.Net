@@ -2,7 +2,7 @@ package com.example.bountynet.Objects
 
 data class Bounty(
     val name: String = "Unnamed Bounty",
-    val reward: Double = 0.0,
+    val reward: Int = 0,
     val concluida: Boolean = false,
     val tempo: String = "Unfinished",
     val hunter: String = "None",

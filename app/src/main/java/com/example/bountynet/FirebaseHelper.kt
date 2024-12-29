@@ -7,7 +7,37 @@ import com.example.bountynet.Objects.Bounty
 object FirebaseHelper {
     private val database: DatabaseReference = FirebaseDatabase.getInstance().reference
 
+    fun updateObjectAttribute(
+        path: String,
+        id: String,
+        attribute: String,
+        attributeValue: Any,
+        onFailure: (String) -> Unit
+    ) {
+        database.child(path).child(id).child(attribute).setValue(attributeValue)
+            .addOnFailureListener { exception ->
+                onFailure("Error updating attribute: ${exception.message}")
+            }
 
+    }
+
+    fun getUserCreds(
+        userId: String,
+        onSuccess: (Int) -> Unit,
+        onFailure: (String) -> Unit
+    ){
+        getObjectById(
+            path = "users",
+            id = userId,
+            type = User::class.java,
+            onSuccess = { userRet ->
+                onSuccess(userRet.creds)
+            },
+            onFailure = { error ->
+                onFailure(error)
+            }
+        )
+    }
 
     fun checkAndCreateUser(
         username: String,
