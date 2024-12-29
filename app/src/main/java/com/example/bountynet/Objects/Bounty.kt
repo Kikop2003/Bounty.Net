@@ -8,6 +8,8 @@ data class Bounty(
     val hunter: String = "None",
     val planeta: String = "Not Defined",
     val createdBy: String = "Undefined",
+    val lat: Double = 0.0,
+    val lon: Double = 0.0,
 
 ) {
     companion object {
