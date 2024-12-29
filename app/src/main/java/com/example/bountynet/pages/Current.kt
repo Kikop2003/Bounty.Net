@@ -64,7 +64,6 @@ fun Current(modifier: Modifier = Modifier, userId: String, navHostController: Na
     var text by remember { mutableStateOf("Loading...") }
     var isLoading by remember { mutableStateOf(true) } // State for loading
 
-    // Fetch bounty information
     LaunchedEffect(userId) {
         isLoading = true
         FirebaseHelper.getUserBounty(

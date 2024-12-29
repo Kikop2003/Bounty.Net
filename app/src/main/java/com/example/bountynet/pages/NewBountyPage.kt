@@ -156,14 +156,12 @@ fun CreateBountyPage(
                         var creds = 0
 
                         if (!errorName && !errorReward && !errorPlanet && !errorLat && !errorLon) {
-
-                            // Asynchronously get user credentials
-                            FirebaseHelper.getUserCreds(
-                                userId = userId,
+                            FirebaseHelper.getObjectAttribute(
+                                path = "users",
+                                id = userId,
+                                attribute = "creds",
                                 onSuccess = { retCreds ->
-
-                                    creds = retCreds
-
+                                    creds = (retCreds as Long).toInt()
                                     // Check if the user has enough credits
                                     if (rewardValue!! > creds) {
                                         errorMoney = true
@@ -208,7 +206,7 @@ fun CreateBountyPage(
                                         }
                                     }
                                 },
-                                onFailure = { error ->
+                                onFailure = {error ->
                                     // Handle error when fetching user credentials
                                     Toast.makeText(navController.context, "Failed to retrieve user credits", Toast.LENGTH_SHORT).show()
                                 }

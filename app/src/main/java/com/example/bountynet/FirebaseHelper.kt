@@ -21,22 +21,24 @@ object FirebaseHelper {
 
     }
 
-    fun getUserCreds(
-        userId: String,
-        onSuccess: (Int) -> Unit,
+    fun getObjectAttribute(
+        path: String,
+        id: String,
+        attribute: String,
+        onSuccess: (Any) -> Unit,
         onFailure: (String) -> Unit
-    ){
-        getObjectById(
-            path = "users",
-            id = userId,
-            type = User::class.java,
-            onSuccess = { userRet ->
-                onSuccess(userRet.creds)
-            },
-            onFailure = { error ->
-                onFailure(error)
+    ) {
+        database.child(path).child(id).child(attribute).get()
+            .addOnSuccessListener { snapshot ->
+            val attributeValue = snapshot.value
+            if (attributeValue != null) {
+                onSuccess(attributeValue)
+            } else {
+                onFailure("Attribute not found")
             }
-        )
+        }.addOnFailureListener { exception ->
+            onFailure("Error retrieving attribute: ${exception.message}")
+        }
     }
 
     fun checkAndCreateUser(
@@ -80,9 +82,6 @@ object FirebaseHelper {
         }
     }
 
-
-
-
     fun getUserBounty(
         userId: String,
         onSuccess: (Bounty) -> Unit,
@@ -94,19 +93,20 @@ object FirebaseHelper {
             type = User::class.java,
             onSuccess = { userRet ->
                 val bountyId = userRet.currentBountyId.toString()
-                if (bountyId != "ERROR") {
+                // Early return if no bounty
+                if (bountyId == "ERROR") {
+                    onFailure("User has no bounty")
+                }else{
                     getObjectById(
                         path = "bountys",
                         id = bountyId,
                         type = Bounty::class.java,
-                        onSuccess = { bountyRet -> onSuccess(bountyRet) },
-                        onFailure = { error -> onFailure(error) }
+                        onSuccess = onSuccess,
+                        onFailure = onFailure
                     )
-                }else{
-                    onFailure("User has no bounty")
                 }
             },
-            onFailure = { error -> onFailure(error) }
+            onFailure = onFailure
         )
     }
 
@@ -136,8 +136,6 @@ object FirebaseHelper {
             }
         })
     }
-
-
     fun <T> addToDatabase(
         path: String,
         item: T,
@@ -178,24 +176,23 @@ object FirebaseHelper {
             }
         }
     }
-    fun acceptBounty(bountyId: String, userId: String, callback: (String) -> Unit) {
+    fun acceptBounty(
+        bountyId: String,
+        userId: String,
+        callback: (String) -> Unit
+    ) {
         val refUser = database.child("users").child(userId)
         refUser.child("currentBountyId").get().addOnSuccessListener { snapshot ->
-            // Get the current bounty ID from the snapshot
             val currentBountyId = snapshot.getValue(String::class.java)
 
             if (currentBountyId != "ERROR") {
                 callback("User already has an active bounty")
-                return@addOnSuccessListener
+            }else{
+                val refBounty = database.child("bountys").child(bountyId)
+                refBounty.child("hunter").setValue(userId)
+                refUser.child("currentBountyId").setValue(bountyId)
+                callback("Bounty accepted successfully")
             }
-
-            val refBounty = database.child("bountys").child(bountyId)
-            refBounty.child("hunter").setValue(userId)
-            refUser.child("currentBountyId").setValue(bountyId)
-
-            callback("Bounty accepted successfully")
         }
     }
-
-
 }
