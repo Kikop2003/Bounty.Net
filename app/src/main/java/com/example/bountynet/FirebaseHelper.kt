@@ -47,10 +47,6 @@ object FirebaseHelper {
         onSuccess: (String) -> Unit,
         onFailure: (String) -> Unit
     ) {
-        if (username.isEmpty() || password.isEmpty()) {
-            onFailure("Username and password cannot be empty")
-            return
-        }
         val userRef = database.child("users")
         // Check if the username already exists
         userRef.orderByChild("username").equalTo(username).get().addOnCompleteListener { task ->
