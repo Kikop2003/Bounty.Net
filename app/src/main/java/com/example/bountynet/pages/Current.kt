@@ -122,15 +122,13 @@ fun GoogleMapsScreen(modifier: Modifier, navController: NavHostController, bount
     val fusedLocationProviderClient = remember {
         LocationServices.getFusedLocationProviderClient(context)
     }
-    Toast.makeText(context, bounty.name, Toast.LENGTH_SHORT).show()
-
     // Set up CameraPositionState
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(LatLng(0.0, 0.0), 10f) // Initial position and zoom
     }
 
     val userLocation = remember { mutableStateOf<LatLng?>(null) }
-    val destination = LatLng(37.7749, -122.4194) // Example destination
+    val destination = LatLng(bounty.lat, bounty.lon) // Example destination
 
     val currentBackStackEntry = navController.currentBackStackEntry
     val savedLocal = currentBackStackEntry?.savedStateHandle?.get<LatLng?>("startLocation")
@@ -184,6 +182,7 @@ fun GoogleMapsScreen(modifier: Modifier, navController: NavHostController, bount
             fusedLocationProviderClient.removeLocationUpdates(locationCallback)
         }
     }
+
 
     // Render the Google Map with the camera position state
     Box() {
