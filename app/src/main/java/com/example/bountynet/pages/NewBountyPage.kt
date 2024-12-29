@@ -1,6 +1,12 @@
 package com.example.bountynet.pages
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.location.Location
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,7 +22,11 @@ import com.example.bountynet.FirebaseHelper
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.TextFieldDefaults.colors
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.core.content.ContextCompat
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 
 @Composable
 fun CreateBountyPage(
@@ -262,6 +272,36 @@ fun LatLongInput(
     onLatitudeChange: (String) -> Unit,
     onLongitudeChange: (String) -> Unit
 ) {
+    val context = LocalContext.current
+    var permissionGranted by remember { mutableStateOf(false) }
+    var currentLocation by remember { mutableStateOf<Location?>(null) }
+
+    // FusedLocationProviderClient for location retrieval
+    val fusedLocationClient = remember {
+        LocationServices.getFusedLocationProviderClient(context)
+    }
+
+    // Permission launcher
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        permissionGranted = isGranted
+        if (isGranted) {
+            // Permission granted, retrieve location
+            retrieveLocation(
+                fusedLocationClient = fusedLocationClient,
+                onLocationRetrieved = { location ->
+                    currentLocation = location
+                    onLatitudeChange(location.latitude.toString())
+                    onLongitudeChange(location.longitude.toString())
+                },
+                context = context
+            )
+        } else {
+            Toast.makeText(context, "Permission denied.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
@@ -284,7 +324,7 @@ fun LatLongInput(
                     text = "Please enter a valid latitude [-90,90]",
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.align(Alignment.Start) // Align within Column
+                    modifier = Modifier.align(Alignment.Start)
                 )
             }
         }
@@ -304,12 +344,66 @@ fun LatLongInput(
                     text = "Please enter a valid longitude [-180,180]",
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.align(Alignment.Start) // Align within Column
+                    modifier = Modifier.align(Alignment.Start)
                 )
             }
         }
     }
+
+    Button(
+        onClick = {
+            if (ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                // Permission already granted, retrieve location
+                retrieveLocation(
+                    fusedLocationClient = fusedLocationClient,
+                    onLocationRetrieved = { location ->
+                        currentLocation = location
+                        onLatitudeChange(location.latitude.toString())
+                        onLongitudeChange(location.longitude.toString())
+                    },
+                    context = context
+                )
+            } else {
+                // Request permission
+                launcher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            }
+        },
+        modifier = Modifier.padding(top = 16.dp)
+    ) {
+        Text("Use Current Location")
+    }
 }
+
+// Function to retrieve location
+private fun retrieveLocation(
+    fusedLocationClient: FusedLocationProviderClient,
+    onLocationRetrieved: (Location) -> Unit,
+    context: Context
+) {
+    if (ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
+    ) {
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location: Location? ->
+                location?.let {
+                    onLocationRetrieved(it)
+                } ?: run {
+                    Toast.makeText(context, "Unable to retrieve location. Remember to turn on location.", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .addOnFailureListener {
+                Toast.makeText(context, "Failed to retrieve location: ${it.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+}
+
+
 
 @Composable
 fun PlanetPicker(
