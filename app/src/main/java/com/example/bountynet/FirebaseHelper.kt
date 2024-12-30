@@ -41,11 +41,11 @@ object FirebaseHelper {
                             refUser.addListenerForSingleValueEvent(object : ValueEventListener {
                                 override fun onDataChange(fullUserSnapshot: DataSnapshot) {
                                     val currentCreds = fullUserSnapshot.child("creds").getValue(Int::class.java) ?: 0
-                                    val bountiesCompleted = fullUserSnapshot.child("bountiesCompleted").getValue(Int::class.java) ?: 0
+                                    val bountiesCompleted = fullUserSnapshot.child("completedBounties").getValue(Int::class.java) ?: 0
 
                                     refUser.child("currentBountyId").setValue("ERROR")
                                     refUser.child("creds").setValue(currentCreds + reward)
-                                    refUser.child("bountiesCompleted").setValue(bountiesCompleted + 1)
+                                    refUser.child("completedBounties").setValue(bountiesCompleted + 1)
 
                                     // Update bounty data
                                     refBounty.child("concluida").setValue(true)
