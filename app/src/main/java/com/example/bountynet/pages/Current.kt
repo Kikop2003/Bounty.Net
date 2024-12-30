@@ -1,21 +1,13 @@
 package com.example.bountynet.pages
 
 
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.rememberCameraPositionState
-import com.google.maps.android.compose.rememberMarkerState
-import androidx.compose.runtime.getValue
 import android.Manifest
+import android.content.Context.SENSOR_SERVICE
 import android.content.pm.PackageManager
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.location.Location
 import android.location.Location.distanceBetween
 import android.os.Looper
@@ -23,21 +15,46 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import com.example.bountynet.FirebaseHelper
 import com.example.bountynet.Objects.Bounty
 import com.google.android.gms.location.*
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
-
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.rememberMarkerState
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
+import com.example.bountynet.R
 
 @Composable
 fun Current(
@@ -135,9 +152,12 @@ fun GoogleMapsScreen(
         LocationServices.getFusedLocationProviderClient(context)
     }
     // Set up CameraPositionState
+
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(LatLng(0.0, 0.0), 10f) // Initial position and zoom
     }
+
+
 
     val userLocation = remember { mutableStateOf<LatLng?>(null) }
     val destination = LatLng(bounty.lat, bounty.lon) // Example destination
@@ -159,7 +179,9 @@ fun GoogleMapsScreen(
                         navController.currentBackStackEntry?.savedStateHandle?.set("startLocation", latLng)
                         startLocation.value = latLng
                     }
-                    cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(latLng, 10f))
+                    if (bounty.planeta == "Earth"){
+                        cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(latLng, 10f))
+                    }
                 } ?: Toast.makeText(context, "Remember To turn on location", Toast.LENGTH_SHORT).show()
             }
         }
@@ -169,7 +191,7 @@ fun GoogleMapsScreen(
     val locationRequest = LocationRequest.Builder(Priority.PRIORITY_LOW_POWER, 5000)
         .setMinUpdateIntervalMillis(2000)
         .build()
-
+    var results by remember { mutableFloatStateOf((0f)) }
     var showButton by remember { mutableStateOf(false) }
     val locationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
@@ -177,14 +199,15 @@ fun GoogleMapsScreen(
                 val latLng = LatLng(location.latitude, location.longitude)
                 userLocation.value = latLng
                 // Update camera position only if needed
-                if (startLocation.value == null){
+                if (startLocation.value == null && bounty.planeta == "Earth"){
                     navController.currentBackStackEntry?.savedStateHandle?.set("startLocation", latLng)
                     startLocation.value = latLng
                     cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(latLng, 10f))
                 }
-                val results = FloatArray(1)
-                distanceBetween(location.latitude, location.longitude, destination.latitude, destination.longitude, results)
-                showButton = results[0] <= 100
+                var resu = FloatArray(1)
+                distanceBetween(location.latitude, location.longitude, destination.latitude, destination.longitude, resu)
+                results = resu[0]
+                showButton = resu[0] <= 100
             }
         }
     }
@@ -198,38 +221,52 @@ fun GoogleMapsScreen(
         }
     }
 
-
-    // Check if the user is within 10 meters of the destination
-
-
-
-    // Render the Google Map with the camera position state
     Box {
         Box {
-            GoogleMap(
-                modifier = Modifier.fillMaxSize(), // Replace with your specific modifier if needed
-                cameraPositionState = cameraPositionState
-            ) {
-                userLocation.value?.let {
-                    // Display a marker at the user's current location
+            if (bounty.planeta == "Earth") {
+                GoogleMap(
+                    modifier = Modifier.fillMaxSize(), // Replace with your specific modifier if needed
+                    cameraPositionState = cameraPositionState
+                ) {
+                    userLocation.value?.let {
+                        // Display a marker at the user's current location
+                        Marker(
+                            state = MarkerState(position = it),
+                            title = "You are here"
+                        )
+                    }
+                    startLocation.value?.let {
+                        // Display a marker at the start location
+                        Marker(
+                            state = MarkerState(position = it),
+                            title = "Start Location"
+                        )
+                    }
                     Marker(
-                        state = MarkerState(position = it),
-                        title = "You are here"
+                        state = rememberMarkerState(position = destination),
+                        title = "Destination"
                     )
                 }
-                startLocation.value?.let {
-                    // Display a marker at the start location
-                    Marker(
-                        state = MarkerState(position = it),
-                        title = "Start Location"
-                    )
-                }
-                Marker(
-                    state = rememberMarkerState(position = destination),
-                    title = "Destination"
+            }else{
+                val sensorManager = context.getSystemService(SENSOR_SERVICE) as SensorManager
+                ArrowScreen(
+                    currentLat = userLocation.value?.latitude ?: 0.0,
+                    currentLng = userLocation.value?.longitude ?: 0.0,
+                    destinationLat = destination.latitude,
+                    destinationLng = destination.longitude,
+                    sensorManager = sensorManager
                 )
             }
-
+            Text(
+                modifier = Modifier
+                    .padding(bottom = 180.dp) // Padding to adjust the button vertically
+                    .align(Alignment.BottomCenter)
+                    .background(Color.Black) // Set the background color to black
+                    .padding(8.dp), // Add some padding around the text to make it more readable
+                text = "$results m",
+                color = Color.White, // Set the text color to white to contrast against the black background
+                fontWeight = FontWeight.Bold // Make the text bold
+            )
             if (showButton) {
                 Button(
                     onClick = { FirebaseHelper.concludeBounty(userId)},
@@ -243,3 +280,99 @@ fun GoogleMapsScreen(
         }
     }
 }
+
+@Composable
+fun ArrowScreen(
+    currentLat: Double,
+    currentLng: Double,
+    destinationLat: Double,
+    destinationLng: Double,
+    sensorManager: SensorManager
+) {
+    val scope = rememberCoroutineScope()
+
+    // State variables for orientation and direction
+    var azimuth by remember { mutableFloatStateOf(0f) }
+    var direction by remember { mutableFloatStateOf(0f) }
+
+    // Calculate bearing
+    val bearing = calculateBearing(currentLat, currentLng, destinationLat, destinationLng)
+
+    // Sensor listener
+    val sensorListener = remember {
+        object : SensorEventListener {
+            private var gravity: FloatArray? = null
+            private var geomagnetic: FloatArray? = null
+
+            override fun onSensorChanged(event: SensorEvent?) {
+                if (event == null) return
+
+                when (event.sensor.type) {
+                    Sensor.TYPE_ACCELEROMETER -> gravity = event.values
+                    Sensor.TYPE_MAGNETIC_FIELD -> geomagnetic = event.values
+                }
+
+                if (gravity != null && geomagnetic != null) {
+                    val R = FloatArray(9)
+                    val I = FloatArray(9)
+                    if (SensorManager.getRotationMatrix(R, I, gravity, geomagnetic)) {
+                        val orientation = FloatArray(3)
+                        SensorManager.getOrientation(R, orientation)
+                        azimuth = Math.toDegrees(orientation[0].toDouble()).toFloat()
+                    }
+                }
+                // Update the direction state
+                scope.launch(Dispatchers.Main) {
+                    direction = (bearing - azimuth + 360) % 360
+                }
+            }
+
+            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+        }
+    }
+
+    // Register sensors
+    DisposableEffect(Unit) {
+        val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        val magnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
+
+        sensorManager.registerListener(sensorListener, accelerometer, SensorManager.SENSOR_DELAY_UI)
+        sensorManager.registerListener(sensorListener, magnetometer, SensorManager.SENSOR_DELAY_UI)
+
+        onDispose {
+            sensorManager.unregisterListener(sensorListener)
+        }
+    }
+
+    // Display the arrow
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Image(
+            painter = painterResource(id = R.drawable.arrow),
+            contentDescription = "Arrow pointing to destination",
+            modifier = Modifier
+                .size(100.dp)
+                .graphicsLayer { rotationZ = direction }
+        )
+
+    }
+}
+
+// Function to calculate bearing
+fun calculateBearing(
+    currentLat: Double,
+    currentLng: Double,
+    destinationLat: Double,
+    destinationLng: Double
+): Float {
+    val deltaLng = Math.toRadians(destinationLng - currentLng)
+    val currentLatRad = Math.toRadians(currentLat)
+    val destinationLatRad = Math.toRadians(destinationLat)
+
+    val y = sin(deltaLng) * cos(destinationLatRad)
+    val x = cos(currentLatRad) * sin(destinationLatRad) -
+            sin(currentLatRad) * cos(destinationLatRad) * cos(deltaLng)
+
+    val bearing = Math.toDegrees(atan2(y, x))
+    return ((bearing + 360) % 360).toFloat()
+}
+
