@@ -3,6 +3,8 @@ package com.example.bountynet
 import com.example.bountynet.Objects.User
 import com.google.firebase.database.*
 import com.example.bountynet.Objects.Bounty
+import android.util.Log
+
 
 object FirebaseHelper {
     private val database: DatabaseReference = FirebaseDatabase.getInstance().reference
@@ -19,6 +21,54 @@ object FirebaseHelper {
                 onFailure("Error updating attribute: ${exception.message}")
             }
 
+    }
+    fun concludeBounty(
+        userId: String
+    ){
+        val refUser = database.child("users").child(userId)
+
+        refUser.child("currentBountyId").addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(userSnapshot: DataSnapshot) {
+                val currentBountyId = userSnapshot.getValue(String::class.java) ?: "ERROR"
+
+                if (currentBountyId != "ERROR") {
+                    val refBounty = database.child("bountys").child(currentBountyId)
+
+                    refBounty.addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(bountySnapshot: DataSnapshot) {
+                            val reward = bountySnapshot.child("reward").getValue(Int::class.java) ?: 0
+
+                            refUser.addListenerForSingleValueEvent(object : ValueEventListener {
+                                override fun onDataChange(fullUserSnapshot: DataSnapshot) {
+                                    val currentCreds = fullUserSnapshot.child("creds").getValue(Int::class.java) ?: 0
+                                    val bountiesCompleted = fullUserSnapshot.child("bountiesCompleted").getValue(Int::class.java) ?: 0
+
+                                    refUser.child("currentBountyId").setValue("ERROR")
+                                    refUser.child("creds").setValue(currentCreds + reward)
+                                    refUser.child("bountiesCompleted").setValue(bountiesCompleted + 1)
+
+                                    // Update bounty data
+                                    refBounty.child("concluida").setValue(true)
+                                    refBounty.child("tempo").setValue("2")
+                                }
+
+                                override fun onCancelled(error: DatabaseError) {
+                                    Log.e("Firebase", "Failed to fetch user data: ${error.message}")
+                                }
+                            })
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+                            Log.e("Firebase", "Failed to fetch bounty data: ${error.message}")
+                        }
+                    })
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("Firebase", "Failed to fetch current bounty ID: ${error.message}")
+            }
+        })
     }
 
     fun getObjectAttribute(

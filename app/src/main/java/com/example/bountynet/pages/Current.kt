@@ -1,5 +1,6 @@
 package com.example.bountynet.pages
 
+
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -16,16 +17,19 @@ import androidx.compose.runtime.getValue
 import android.Manifest
 import android.content.pm.PackageManager
 import android.location.Location
+import android.location.Location.distanceBetween
 import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import com.example.bountynet.FirebaseHelper
@@ -36,7 +40,11 @@ import com.google.maps.android.compose.*
 
 
 @Composable
-fun Current(modifier: Modifier = Modifier, userId: String, navHostController: NavHostController){
+fun Current(
+    modifier: Modifier = Modifier,
+    userId: String,
+    navHostController: NavHostController
+){
     val context = LocalContext.current
     var permissionGranted by remember { mutableStateOf(false) }
 
@@ -92,7 +100,7 @@ fun Current(modifier: Modifier = Modifier, userId: String, navHostController: Na
         }
         bounty != null -> {
             if (permissionGranted) {
-                GoogleMapsScreen(modifier,navHostController, bounty!!)
+                GoogleMapsScreen(modifier,navHostController, bounty!!, userId)
             } else {
                 Box(modifier = Modifier.fillMaxSize()) {
                     Text(
@@ -116,7 +124,12 @@ fun Current(modifier: Modifier = Modifier, userId: String, navHostController: Na
 
 
 @Composable
-fun GoogleMapsScreen(modifier: Modifier, navController: NavHostController, bounty: Bounty) {
+fun GoogleMapsScreen(
+    modifier: Modifier,
+    navController: NavHostController,
+    bounty: Bounty,
+    userId: String
+) {
     val context = LocalContext.current
     val fusedLocationProviderClient = remember {
         LocationServices.getFusedLocationProviderClient(context)
@@ -157,7 +170,7 @@ fun GoogleMapsScreen(modifier: Modifier, navController: NavHostController, bount
         .setMinUpdateIntervalMillis(2000)
         .build()
 
-
+    var showButton by remember { mutableStateOf(false) }
     val locationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
             locationResult.lastLocation?.let { location ->
@@ -169,6 +182,9 @@ fun GoogleMapsScreen(modifier: Modifier, navController: NavHostController, bount
                     startLocation.value = latLng
                     cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(latLng, 10f))
                 }
+                val results = FloatArray(1)
+                distanceBetween(location.latitude, location.longitude, destination.latitude, destination.longitude, results)
+                showButton = results[0] <= 100
             }
         }
     }
@@ -183,30 +199,47 @@ fun GoogleMapsScreen(modifier: Modifier, navController: NavHostController, bount
     }
 
 
+    // Check if the user is within 10 meters of the destination
+
+
+
     // Render the Google Map with the camera position state
-    Box() {
-        GoogleMap(
-            modifier = Modifier.fillMaxSize(), // para nao ter a barra de navegação a sobrepor ao mapa substituir por modifier
-            cameraPositionState = cameraPositionState
-        ) {
-            userLocation.value?.let {
-                // Display a marker at the user's current location
+    Box {
+        Box {
+            GoogleMap(
+                modifier = Modifier.fillMaxSize(), // Replace with your specific modifier if needed
+                cameraPositionState = cameraPositionState
+            ) {
+                userLocation.value?.let {
+                    // Display a marker at the user's current location
+                    Marker(
+                        state = MarkerState(position = it),
+                        title = "You are here"
+                    )
+                }
+                startLocation.value?.let {
+                    // Display a marker at the start location
+                    Marker(
+                        state = MarkerState(position = it),
+                        title = "Start Location"
+                    )
+                }
                 Marker(
-                    state = MarkerState(position = it),
-                    title = "You are here"
+                    state = rememberMarkerState(position = destination),
+                    title = "Destination"
                 )
             }
-            startLocation.value?.let {
-                // Display a marker at the user's current location
-                Marker(
-                    state = MarkerState(position = it),
-                    title = "Start Location"
-                )
+
+            if (showButton) {
+                Button(
+                    onClick = { FirebaseHelper.concludeBounty(userId)},
+                    modifier = Modifier
+                        .padding(bottom = 128.dp) // Padding to adjust the button vertically
+                        .align(Alignment.BottomCenter) // Align the button at the bottom
+                ) {
+                    Text("Conclude Bounty")
+                }
             }
-            Marker(
-                state = rememberMarkerState(position = destination),
-                title = "Destination"
-            )
         }
     }
 }
