@@ -167,6 +167,8 @@ fun GoogleMapsScreen(
 
     var startLocation = remember { mutableStateOf<LatLng?>(savedLocal)}
 
+    var results by remember { mutableFloatStateOf((0f)) }
+    var showButton by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -182,17 +184,20 @@ fun GoogleMapsScreen(
                     if (bounty.planeta == "Earth"){
                         cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(latLng, 10f))
                     }
+                    var resu = FloatArray(1)
+                    distanceBetween(location.latitude, location.longitude, destination.latitude, destination.longitude, resu)
+                    results = resu[0]
+                    showButton = resu[0] <= 100
                 } ?: Toast.makeText(context, "Remember To turn on location", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
     // Real-time location updates
-    val locationRequest = LocationRequest.Builder(Priority.PRIORITY_LOW_POWER, 5000)
+    val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 5000)
         .setMinUpdateIntervalMillis(2000)
         .build()
-    var results by remember { mutableFloatStateOf((0f)) }
-    var showButton by remember { mutableStateOf(false) }
+
     val locationCallback = object : LocationCallback() {
         override fun onLocationResult(locationResult: LocationResult) {
             locationResult.lastLocation?.let { location ->
@@ -269,7 +274,9 @@ fun GoogleMapsScreen(
             )
             if (showButton) {
                 Button(
-                    onClick = { FirebaseHelper.concludeBounty(userId)},
+                    onClick = {
+                        navController.navigate("photo")
+                              },
                     modifier = Modifier
                         .padding(bottom = 128.dp) // Padding to adjust the button vertically
                         .align(Alignment.BottomCenter) // Align the button at the bottom

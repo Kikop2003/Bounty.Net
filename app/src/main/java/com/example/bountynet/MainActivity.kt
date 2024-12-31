@@ -1,5 +1,6 @@
 package com.example.bountynet
 
+import PhotoPage
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -53,6 +54,12 @@ fun AppNavigation() {
             MainScreen(
                 userId = userId,
                 navController = navController,
+            )
+        }
+        composable("photo"){
+            PhotoPage(
+                navController = navController,
+                userId = userId
             )
         }
         composable(
