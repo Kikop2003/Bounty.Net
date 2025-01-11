@@ -64,13 +64,17 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
     ) {
         when {
             isLoading -> {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center),
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
             errorMessage != null -> {
                 Text(
                     text = errorMessage ?: "An error occurred",
                     color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.align(Alignment.Center)
                 )
             }
             else -> {
@@ -85,7 +89,7 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
                         TextField(
                             value = searchText,
                             onValueChange = { searchText = it },
-                            placeholder = { Text("Search bounties...") },
+                            placeholder = { Text("Search bounties...", style = MaterialTheme.typography.bodyLarge) },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(16.dp),
@@ -105,17 +109,21 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 16.dp, vertical = 8.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             TextButton(onClick = { isSortDialogOpen = true }) {
-                                Text("Sort By ${sortProperty.replaceFirstChar { it.uppercase() }}")
+                                Text("Sort By ${sortProperty.replaceFirstChar { it.uppercase() }}", color = MaterialTheme.colorScheme.primary,
+                                    style = MaterialTheme.typography.bodySmall)
                             }
                             Spacer(modifier = Modifier.weight(1f))
                             TextButton(onClick = { isFilterDialogOpen = true }) {
-                                Text("Filter by Planet")
+                                Text("Filter by Planet", color = MaterialTheme.colorScheme.primary,
+                                    style = MaterialTheme.typography.bodySmall)
                             }
                             TextButton(onClick = { sortAscending = !sortAscending }) {
-                                Text(if (sortAscending) "Ascending" else "Descending")
+                                Text(if (sortAscending) "Ascending" else "Descending", color = MaterialTheme.colorScheme.primary,
+                                    style = MaterialTheme.typography.bodySmall)
                             }
                         }
                     }
@@ -173,7 +181,6 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
     }
 }
 
-
 @Composable
 fun SortDialog(
     currentSortProperty: String,
@@ -185,31 +192,39 @@ fun SortDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
             Button(onClick = onDismiss) {
-                Text("OK")
+                Text("OK", color = MaterialTheme.colorScheme.onPrimary)
             }
         },
-        title = { Text("Sort Options") },
+        title = { Text("Sort Options", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary) },
         text = {
             Column {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp).clickable { onApply("name", currentSortAscending) }
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                        .clickable { onApply("name", currentSortAscending) }
                 ) {
                     RadioButton(
                         selected = currentSortProperty == "name",
-                        onClick = { onApply("name", currentSortAscending) }
+                        onClick = { onApply("name", currentSortAscending) },
+                        colors = RadioButtonDefaults.colors(selectedColor = MaterialTheme.colorScheme.primary)
                     )
-                    Text("Sort by Name")
+                    Text("Sort by Name", style = MaterialTheme.typography.bodyLarge)
                 }
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp).clickable { onApply("reward", currentSortAscending) }
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                        .clickable { onApply("reward", currentSortAscending) }
                 ) {
                     RadioButton(
                         selected = currentSortProperty == "reward",
-                        onClick = { onApply("reward", currentSortAscending) }
+                        onClick = { onApply("reward", currentSortAscending) },
+                        colors = RadioButtonDefaults.colors(selectedColor = MaterialTheme.colorScheme.primary)
                     )
-                    Text("Sort by Reward")
+                    Text("Sort by Reward", style = MaterialTheme.typography.bodyLarge)
                 }
             }
         }
@@ -226,10 +241,10 @@ fun FilterDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
             Button(onClick = onDismiss) {
-                Text("Apply")
+                Text("Apply", color = MaterialTheme.colorScheme.onPrimary)
             }
         },
-        title = { Text("Filter by Planet") },
+        title = { Text("Filter by Planet", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary) },
         text = {
             LazyColumn {
                 items(Bounty.possiblePlanets) { planet ->
@@ -257,12 +272,14 @@ fun FilterDialog(
                                     filterList.toMutableList().apply { remove(planet) }
                                 }
                                 onFilterChange(updatedList)
-                            }
+                            },
+                            colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.primary)
                         )
                         Text(
                             text = planet,
                             style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(start = 8.dp)
+                            modifier = Modifier.padding(start = 8.dp),
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 }

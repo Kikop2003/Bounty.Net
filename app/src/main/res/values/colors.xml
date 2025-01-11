@@ -7,4 +7,17 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- novas cores do tema cyberpunk -->
+
+    <color name="cyber_primary">#00FFF7</color> <!-- Cian neon -->
+    <color name="cyber_secondary">#FF007A</color> <!-- Rosa neon -->
+    <color name="cyber_tertiary">#FFD700</color> <!-- Dourado vibrante -->
+    <color name="cyber_background">#0A001F</color> <!-- Preto profundo com um tom azulado -->
+    <color name="cyber_surface">#1C0048</color> <!-- Roxo escuro -->
+    <color name="cyber_on_primary">#000000</color> <!-- Preto para contraste -->
+    <color name="cyber_on_secondary">#FFFFFF</color> <!-- Branco para contraste -->
+    <color name="cyber_on_background">#FFFFFF</color> <!-- Branco para texto no fundo -->
+    <color name="cyber_on_surface">#FFFFFF</color> <!-- Branco para texto na superfície -->
+
 </resources>
