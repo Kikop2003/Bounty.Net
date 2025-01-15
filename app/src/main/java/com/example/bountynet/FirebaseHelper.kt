@@ -22,6 +22,19 @@ object FirebaseHelper {
             }
 
     }
+
+    fun getUserCreatedBountys(userId: String, onSucess: (List<Pair<String, Bounty>>) -> Unit){
+        retrieveList(
+            path = "bountys",
+            type = Bounty::class.java,
+            onSuccess = {
+
+                onSucess(it.filter { it.second.createdBy == userId } )
+                        },
+            onFailure = {}
+        )
+    }
+
     fun concludeBounty(
         userId: String
     ){

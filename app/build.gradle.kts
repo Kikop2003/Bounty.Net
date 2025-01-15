@@ -58,6 +58,7 @@ dependencies {
     implementation (libs.firebase.storage)
     implementation (libs.google.firebase.database) // Optional if using Realtime Database
     implementation (libs.firebase.firestore) // Optional if using Firestore
+    implementation (libs.coil.kt.coil.compose) // Make sure to use the latest version
 
 
     implementation(libs.androidx.lifecycle.runtime.ktx)
