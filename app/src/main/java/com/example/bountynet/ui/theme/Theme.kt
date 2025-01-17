@@ -28,7 +28,7 @@ private val LightColorScheme = lightColorScheme(
     primary = NeonCyan , // Ciano neon
     secondary = NeonRose, // Rosa neon
     tertiary = VibrantGolden, // Dourado vibrante
-    background = White, // Branco
+    background = DarkPurple, // Branco - alterei pra roxo
     surface = LightGray, // Cinza claro
     onPrimary = Black, // Preto para contraste
     onSecondary = White, // Branco para contraste
@@ -48,7 +48,7 @@ private val LightColorScheme = lightColorScheme(
 )
 
 @Composable
-fun BountyNetTheme(
+fun bountyNetTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
@@ -67,6 +67,7 @@ fun BountyNetTheme(
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
+        shapes = shapes,
         content = content
     )
 }

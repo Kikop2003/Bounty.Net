@@ -89,7 +89,7 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
                         TextField(
                             value = searchText,
                             onValueChange = { searchText = it },
-                            placeholder = { Text("Search bounties...", style = MaterialTheme.typography.bodyLarge) },
+                            placeholder = { Text("Search bounties...", style = MaterialTheme.typography.titleLarge) },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(16.dp),
@@ -118,11 +118,11 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
                             }
                             Spacer(modifier = Modifier.weight(1f))
                             TextButton(onClick = { isFilterDialogOpen = true }) {
-                                Text("Filter by Planet", color = MaterialTheme.colorScheme.primary,
+                                Text("Filter by Planet", color = MaterialTheme.colorScheme.secondary,
                                     style = MaterialTheme.typography.bodySmall)
                             }
                             TextButton(onClick = { sortAscending = !sortAscending }) {
-                                Text(if (sortAscending) "Ascending" else "Descending", color = MaterialTheme.colorScheme.primary,
+                                Text(if (sortAscending) "Ascending" else "Descending", color = MaterialTheme.colorScheme.tertiary,
                                     style = MaterialTheme.typography.bodySmall)
                             }
                         }
