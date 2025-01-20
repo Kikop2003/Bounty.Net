@@ -53,8 +53,10 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
         val filtered = items.filter {
             (searchText.isEmpty() || it.second.name.contains(searchText, ignoreCase = true)) &&
                     filterList.contains(it.second.planeta) &&
-                    (!showAvailableOnly || it.second.hunter == "None" || !it.second.concluida)
+                    (!showAvailableOnly || it.second.hunter == "None" || it.second.concluida)
         }
+
+
 
         if (sortProperty == "name") {
             if (sortAscending) filtered.sortedBy { it.second.name.lowercase() } else filtered.sortedByDescending { it.second.name.lowercase() }
