@@ -37,6 +37,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
@@ -263,6 +264,70 @@ fun GoogleMapsScreen(
                 }
             }else{
                 val sensorManager = context.getSystemService(SENSOR_SERVICE) as SensorManager
+                if(bounty.planeta == "Mars"){
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .paint(painterResource(id = R.drawable.mars_texture),
+                                contentScale = androidx.compose.ui.layout.ContentScale.FillBounds)
+                    ) {
+                        ArrowScreen(
+                            currentLat = userLocation.value?.latitude ?: 0.0,
+                            currentLng = userLocation.value?.longitude ?: 0.0,
+                            destinationLat = destination.latitude,
+                            destinationLng = destination.longitude,
+                            sensorManager = sensorManager
+                        )
+                    }
+                }
+                if(bounty.planeta == "Jupiter"){
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .paint(painterResource(id = R.drawable.jupiter_texture),
+                                contentScale = androidx.compose.ui.layout.ContentScale.FillBounds)
+                    ) {
+                        ArrowScreen(
+                            currentLat = userLocation.value?.latitude ?: 0.0,
+                            currentLng = userLocation.value?.longitude ?: 0.0,
+                            destinationLat = destination.latitude,
+                            destinationLng = destination.longitude,
+                            sensorManager = sensorManager
+                        )
+                    }
+                }
+                if(bounty.planeta == "Saturn"){
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .paint(painterResource(id = R.drawable.saturn_texture),
+                                contentScale = androidx.compose.ui.layout.ContentScale.FillBounds)
+                    ) {
+                        ArrowScreen(
+                            currentLat = userLocation.value?.latitude ?: 0.0,
+                            currentLng = userLocation.value?.longitude ?: 0.0,
+                            destinationLat = destination.latitude,
+                            destinationLng = destination.longitude,
+                            sensorManager = sensorManager
+                        )
+                    }
+                }
+                if (bounty.planeta == "Venus"){
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .paint(painterResource(id = R.drawable.venus_texture),
+                                contentScale = androidx.compose.ui.layout.ContentScale.FillBounds)
+                    ) {
+                        ArrowScreen(
+                            currentLat = userLocation.value?.latitude ?: 0.0,
+                            currentLng = userLocation.value?.longitude ?: 0.0,
+                            destinationLat = destination.latitude,
+                            destinationLng = destination.longitude,
+                            sensorManager = sensorManager
+                        )
+                    }
+                }
                 ArrowScreen(
                     currentLat = userLocation.value?.latitude ?: 0.0,
                     currentLng = userLocation.value?.longitude ?: 0.0,
@@ -365,7 +430,6 @@ fun ArrowScreen(
                     direction = (bearing - azimuth + 360) % 360
                 }
             }
-
             override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
         }
     }
