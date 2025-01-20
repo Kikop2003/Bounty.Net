@@ -9,16 +9,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.bountynet.Objects.Bounty
 import com.example.bountynet.FirebaseHelper
-import com.example.bountynet.R
 import com.google.gson.Gson
-import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 @Composable
 fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostController) {
@@ -64,13 +61,13 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
     }
 
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.TopCenter
     ) {
         when {
             isLoading -> {
                 CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center),
+                    modifier = modifier.align(Alignment.Center),
                     color = MaterialTheme.colorScheme.primary
                 )
             }

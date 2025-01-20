@@ -58,12 +58,12 @@ fun Profile(modifier: Modifier = Modifier, userId: String, ) {
         }
     )
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.TopCenter
     ) {
         when {
             isLoading -> {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                CircularProgressIndicator(modifier = modifier.align(Alignment.Center))
             }
 
             errorMessage != null -> {

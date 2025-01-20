@@ -2,6 +2,7 @@ package com.example.bountynet.pages
 
 
 import android.Manifest
+import android.content.Context
 import android.content.Context.SENSOR_SERVICE
 import android.content.pm.PackageManager
 import android.hardware.Sensor
@@ -10,11 +11,16 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.location.Location
 import android.location.Location.distanceBetween
+import android.os.Build
 import android.os.Looper
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -36,6 +42,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.navigation.NavHostController
 import com.example.bountynet.FirebaseHelper
 import com.example.bountynet.Objects.Bounty
@@ -109,9 +116,9 @@ fun Current(
     when {
         isLoading -> {
             // Circular Progress Indicator for loading state
-            Box(modifier = Modifier.fillMaxSize()) {
+            Box(modifier = modifier.fillMaxSize()) {
                 CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
+                    modifier = modifier.align(Alignment.Center)
                 )
             }
         }
@@ -119,19 +126,19 @@ fun Current(
             if (permissionGranted) {
                 GoogleMapsScreen(modifier,navHostController, bounty!!, userId)
             } else {
-                Box(modifier = Modifier.fillMaxSize()) {
+                Box(modifier = modifier.fillMaxSize()) {
                     Text(
                         text = "Permission for fine Location not granted",
-                        modifier = Modifier.align(Alignment.Center)
+                        modifier = modifier.align(Alignment.Center)
                     )
                 }
             }
         }
         failure -> {
-            Box(modifier = Modifier.fillMaxSize()) {
+            Box(modifier = modifier.fillMaxSize()) {
                 Text(
                     text = text,
-                    modifier = Modifier.align(Alignment.Center)
+                    modifier = modifier.align(Alignment.Center)
                 )
             }
         }
@@ -230,7 +237,7 @@ fun GoogleMapsScreen(
         Box {
             if (bounty.planeta == "Earth") {
                 GoogleMap(
-                    modifier = Modifier.fillMaxSize(), // Replace with your specific modifier if needed
+                    modifier = modifier.fillMaxSize(), // Replace with your specific modifier if needed
                     cameraPositionState = cameraPositionState
                 ) {
                     userLocation.value?.let {
@@ -268,11 +275,12 @@ fun GoogleMapsScreen(
                     .align(Alignment.BottomCenter)
                     .background(Color.Black) // Set the background color to black
                     .padding(8.dp), // Add some padding around the text to make it more readable
-                text = "$results m",
+                text = adapt(results),
                 color = Color.White, // Set the text color to white to contrast against the black background
                 fontWeight = FontWeight.Bold // Make the text bold
             )
             if (showButton) {
+                vibratePhone(context)
                 Button(
                     onClick = {
                         navController.navigate("photo")
@@ -285,6 +293,24 @@ fun GoogleMapsScreen(
                 }
             }
         }
+    }
+}
+
+fun adapt(distance: Float): String {
+    return if(distance < 1000){
+        "%.0f km".format(distance/1000)
+    }else{
+        "%.1f km".format(distance/1000)
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.S)
+fun vibratePhone(context: Context) {
+    val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        vibrator.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE))
+    } else {
+        vibrator.vibrate(100)
     }
 }
 
