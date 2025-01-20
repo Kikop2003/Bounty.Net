@@ -4,6 +4,7 @@ package com.example.bountynet.pages
 import android.Manifest
 import android.content.Context
 import android.content.Context.SENSOR_SERVICE
+import android.content.Context.VIBRATOR_MANAGER_SERVICE
 import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -12,6 +13,7 @@ import android.hardware.SensorManager
 import android.location.Location
 import android.location.Location.distanceBetween
 import android.os.Build
+import android.os.CombinedVibration
 import android.os.Looper
 import android.os.VibrationEffect
 import android.os.Vibrator
@@ -283,6 +285,7 @@ fun GoogleMapsScreen(
                 vibratePhone(context)
                 Button(
                     onClick = {
+
                         navController.navigate("photo")
                               },
                     modifier = Modifier
@@ -304,15 +307,18 @@ fun adapt(distance: Float): String {
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.S)
+
 fun vibratePhone(context: Context) {
-    val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        vibrator.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE))
-    } else {
-        vibrator.vibrate(100)
+    val vibrator = getSystemService(context, Vibrator::class.java)
+    vibrator?.let{
+        if(it.hasVibrator()){
+            val vibrationEffect = VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE)
+            it.vibrate(vibrationEffect)
+        }
     }
+
 }
+
 
 @Composable
 fun ArrowScreen(
