@@ -328,13 +328,70 @@ fun GoogleMapsScreen(
                         )
                     }
                 }
-                ArrowScreen(
-                    currentLat = userLocation.value?.latitude ?: 0.0,
-                    currentLng = userLocation.value?.longitude ?: 0.0,
-                    destinationLat = destination.latitude,
-                    destinationLng = destination.longitude,
-                    sensorManager = sensorManager
-                )
+                if (bounty.planeta == "Mustafar"){
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .paint(painterResource(id = R.drawable.mustafar_texture),
+                                contentScale = androidx.compose.ui.layout.ContentScale.FillBounds)
+                    ) {
+                        ArrowScreen(
+                            currentLat = userLocation.value?.latitude ?: 0.0,
+                            currentLng = userLocation.value?.longitude ?: 0.0,
+                            destinationLat = destination.latitude,
+                            destinationLng = destination.longitude,
+                            sensorManager = sensorManager
+                        )
+                    }
+                }
+                if (bounty.planeta == "Tatooine"){
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .paint(painterResource(id = R.drawable.tatooine_texture),
+                                contentScale = androidx.compose.ui.layout.ContentScale.FillBounds)
+                    ) {
+                        ArrowScreen(
+                            currentLat = userLocation.value?.latitude ?: 0.0,
+                            currentLng = userLocation.value?.longitude ?: 0.0,
+                            destinationLat = destination.latitude,
+                            destinationLng = destination.longitude,
+                            sensorManager = sensorManager
+                        )
+                    }
+                }
+                if (bounty.planeta == "Kepler452b"){
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .paint(painterResource(id = R.drawable.kepler_texture),
+                                contentScale = androidx.compose.ui.layout.ContentScale.FillBounds)
+                    ) {
+                        ArrowScreen(
+                            currentLat = userLocation.value?.latitude ?: 0.0,
+                            currentLng = userLocation.value?.longitude ?: 0.0,
+                            destinationLat = destination.latitude,
+                            destinationLng = destination.longitude,
+                            sensorManager = sensorManager
+                        )
+                    }
+                }
+                if (bounty.planeta == "Vormir"){
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .paint(painterResource(id = R.drawable.vormir_texture),
+                                contentScale = androidx.compose.ui.layout.ContentScale.FillBounds)
+                    ) {
+                        ArrowScreen(
+                            currentLat = userLocation.value?.latitude ?: 0.0,
+                            currentLng = userLocation.value?.longitude ?: 0.0,
+                            destinationLat = destination.latitude,
+                            destinationLng = destination.longitude,
+                            sensorManager = sensorManager
+                        )
+                    }
+                }
             }
             Text(
                 modifier = Modifier
