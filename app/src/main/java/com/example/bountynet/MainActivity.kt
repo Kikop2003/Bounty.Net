@@ -14,7 +14,7 @@ import com.example.bountynet.Objects.Bounty
 import com.example.bountynet.pages.BountyDetailPage
 import com.example.bountynet.pages.CreateBountyPage
 import com.example.bountynet.pages.LoginScreen
-import com.example.bountynet.ui.theme.BountyNetTheme
+import com.example.bountynet.ui.theme.bountyNetTheme
 import com.google.common.reflect.TypeToken
 import com.google.firebase.FirebaseApp
 import com.google.gson.Gson
@@ -27,7 +27,7 @@ class MainActivity : ComponentActivity() {
         FirebaseApp.initializeApp(this)
 
         setContent {
-            BountyNetTheme {
+            bountyNetTheme(dynamicColor = false) {
                 AppNavigation() // Pass ViewModel down
             }
         }

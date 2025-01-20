@@ -44,7 +44,6 @@ fun Profile(modifier: Modifier = Modifier, userId: String, ) {
     // State for errors
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    // Simulate fetching user data from Firebase (replace with your FirebaseHelper)
     FirebaseHelper.getObjectById(
         path = "users",
         id = userId,
@@ -92,7 +91,6 @@ fun Profile(modifier: Modifier = Modifier, userId: String, ) {
 
                     Text(text = "Username: ${user.username}")
                     Text(text = "Completed Bounties: ${user.completedBounties}")
-                    Text(text = "Average Time: ${user.averageTime}")
                     Text(text = "Credits: ${user.creds}")
                     Text(text = "Current Bounty ID: ${user.currentBountyId}")
                     ExpandableList(userId)
