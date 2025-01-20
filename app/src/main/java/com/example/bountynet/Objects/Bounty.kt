@@ -13,6 +13,8 @@ data class Bounty(
 
 ) {
     companion object {
-        val possiblePlanets = listOf("Earth", "Mars", "Jupiter", "Venus", "Saturn")
+        val possiblePlanets =
+            listOf("Earth", "Mars", "Jupiter", "Venus", "Saturn",
+                "Mustafar", "Tatooine", "Kepler452b", "Vormir")
     }
 }

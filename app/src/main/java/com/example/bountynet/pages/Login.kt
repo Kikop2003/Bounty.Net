@@ -37,16 +37,16 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp),
-            verticalArrangement = Arrangement.Center,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Spacer(modifier = Modifier.weight(1f)) // Push content 2/3 up
+
             Text(
                 text = "Login",
                 style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.primary
             )
-
-            Spacer(modifier = Modifier.height(16.dp))
 
             // Username Input Field
             OutlinedTextField(
@@ -76,8 +76,6 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit) {
                     modifier = Modifier.align(Alignment.Start)
                 )
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
 
             // Password Input Field
             OutlinedTextField(
@@ -120,8 +118,6 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit) {
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
             // Login Button
             Button(
                 onClick = {
@@ -140,9 +136,7 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit) {
                             username = username,
                             password = password,
                             onSuccess = onLoginSuccess,
-                            onFailure = { error ->
-                                loginStatus = error
-                            }
+                            onFailure = { error -> loginStatus = error }
                         )
                     }
                 },
@@ -156,9 +150,15 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit) {
             }
 
             if (loginStatus.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(text = loginStatus, color = MaterialTheme.colorScheme.error)
+                Text(
+                    text = loginStatus,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
             }
+
+            Spacer(modifier = Modifier.weight(2f)) // Push remaining space below
         }
     }
 }

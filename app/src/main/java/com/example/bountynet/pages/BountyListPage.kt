@@ -1,5 +1,6 @@
 package com.example.bountynet.pages
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -8,11 +9,16 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.bountynet.Objects.Bounty
 import com.example.bountynet.FirebaseHelper
+import com.example.bountynet.R
 import com.google.gson.Gson
+import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 @Composable
 fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostController) {
@@ -25,6 +31,7 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
     var sortAscending by remember { mutableStateOf(true) }
     var sortProperty by remember { mutableStateOf("name") }
     var filterList by remember { mutableStateOf<List<String>>(Bounty.possiblePlanets) }
+    var showUnassignedOnly by remember { mutableStateOf(false) } // New state for unassigned filter
 
     // Load items from Firebase
     LaunchedEffect(Unit) {
@@ -42,13 +49,11 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
         )
     }
 
-    val filteredAndSortedItems = remember(items, searchText, sortAscending, sortProperty, filterList) {
-        val filtered = if (searchText.isNotEmpty()) {
-            items.filter {
-                it.second.name.contains(searchText, ignoreCase = true) && filterList.contains(it.second.planeta)
-            }
-        } else {
-            items.filter { filterList.contains(it.second.planeta) }
+    val filteredAndSortedItems = remember(items, searchText, sortAscending, sortProperty, filterList, showUnassignedOnly) {
+        val filtered = items.filter {
+            (searchText.isEmpty() || it.second.name.contains(searchText, ignoreCase = true)) &&
+                    filterList.contains(it.second.planeta) &&
+                    (!showUnassignedOnly || it.second.hunter == "None")
         }
 
         if (sortProperty == "name") {
@@ -126,6 +131,25 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
                                     style = MaterialTheme.typography.bodySmall)
                             }
                         }
+
+                        // Unassigned Filter Toggle
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Checkbox(
+                                checked = showUnassignedOnly,
+                                onCheckedChange = { showUnassignedOnly = it },
+                                colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.primary)
+                            )
+                            Text(
+                                text = "Show Unassigned Only",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
                     }
 
                     // List of Bounty Items
@@ -180,6 +204,7 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
         }
     }
 }
+
 
 @Composable
 fun SortDialog(
@@ -305,21 +330,53 @@ fun BountyItem(
         ),
         shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)
     ) {
-        Column(
+        Row(
             modifier = Modifier
                 .padding(12.dp)
+                .fillMaxWidth(), // Ensure Row takes up the full width
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = bounty.name,
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "Reward: ${bounty.reward} coins",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface
-            )
+            Column(
+                modifier = modifier//Modifier
+                    //.padding(12.dp)
+            ) {
+                Text(
+                    text = bounty.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Reward: ${bounty.reward} coins",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+
+            PlanetImage(bounty)
         }
+    }
+}
+@Composable
+fun PlanetImage(bounty: Bounty) {
+    val context = LocalContext.current
+    val resourceName = bounty.planeta.lowercase() // Adjust resource naming convention if needed
+    val resourceId = context.resources.getIdentifier(resourceName, "drawable", context.packageName)
+
+    if (resourceId != 0) { // Check if the resource exists
+        Image(
+            painter = painterResource(id = resourceId),
+            contentDescription = bounty.planeta,
+            modifier = Modifier
+                .size(50.dp)
+        )
+    } else {
+        // Fallback: Display a default image if the resource is not found
+        Text(
+            text = bounty.planeta,
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary,
+        )
     }
 }
