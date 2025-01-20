@@ -44,7 +44,6 @@ fun Profile(modifier: Modifier = Modifier, userId: String, ) {
     // State for errors
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    // Simulate fetching user data from Firebase (replace with your FirebaseHelper)
     FirebaseHelper.getObjectById(
         path = "users",
         id = userId,
