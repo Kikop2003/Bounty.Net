@@ -58,7 +58,7 @@ fun Profile(modifier: Modifier = Modifier, userId: String, ) {
         }
     )
     Box(
-        modifier = modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.TopCenter
     ) {
         when {

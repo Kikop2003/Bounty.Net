@@ -39,7 +39,6 @@ fun BountyDetailPage(pair: Pair<String, Bounty>, navController: NavHostControlle
         DetailRow(label = "Planet", value = bounty.planeta)
         if(bounty.concluida){
             DetailRow(label = "Concluded", value = "Yes")
-            DetailRow(label = "Time", value = bounty.tempo)
             DetailRow(label = "Hunter", value = bounty.hunter)
         }
 
