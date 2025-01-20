@@ -27,7 +27,7 @@ class MainActivity : ComponentActivity() {
         FirebaseApp.initializeApp(this)
 
         setContent {
-            bountyNetTheme {
+            bountyNetTheme(dynamicColor = false) {
                 AppNavigation() // Pass ViewModel down
             }
         }

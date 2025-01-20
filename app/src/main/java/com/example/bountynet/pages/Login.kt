@@ -43,7 +43,7 @@ fun LoginScreen(onLoginSuccess: (String) -> Unit) {
             Text(
                 text = "Login",
                 style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.tertiary
+                color = MaterialTheme.colorScheme.primary
             )
 
             Spacer(modifier = Modifier.height(16.dp))

@@ -122,7 +122,7 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
                                     style = MaterialTheme.typography.bodySmall)
                             }
                             TextButton(onClick = { sortAscending = !sortAscending }) {
-                                Text(if (sortAscending) "Ascending" else "Descending", color = MaterialTheme.colorScheme.tertiary,
+                                Text(if (sortAscending) "Asc" else "Desc", color = MaterialTheme.colorScheme.tertiary,
                                     style = MaterialTheme.typography.bodySmall)
                             }
                         }
