@@ -31,7 +31,7 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
     var sortAscending by remember { mutableStateOf(true) }
     var sortProperty by remember { mutableStateOf("name") }
     var filterList by remember { mutableStateOf<List<String>>(Bounty.possiblePlanets) }
-    var showUnassignedOnly by remember { mutableStateOf(false) } // New state for unassigned filter
+    var showAvailableOnly by remember { mutableStateOf(false) } // New state for unassigned filter
 
     // Load items from Firebase
     LaunchedEffect(Unit) {
@@ -49,11 +49,11 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
         )
     }
 
-    val filteredAndSortedItems = remember(items, searchText, sortAscending, sortProperty, filterList, showUnassignedOnly) {
+    val filteredAndSortedItems = remember(items, searchText, sortAscending, sortProperty, filterList, showAvailableOnly) {
         val filtered = items.filter {
             (searchText.isEmpty() || it.second.name.contains(searchText, ignoreCase = true)) &&
                     filterList.contains(it.second.planeta) &&
-                    (!showUnassignedOnly || it.second.hunter == "None")
+                    (!showAvailableOnly || it.second.hunter == "None" || !it.second.concluida)
         }
 
         if (sortProperty == "name") {
@@ -140,12 +140,12 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Checkbox(
-                                checked = showUnassignedOnly,
-                                onCheckedChange = { showUnassignedOnly = it },
+                                checked = showAvailableOnly,
+                                onCheckedChange = { showAvailableOnly = it },
                                 colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colorScheme.primary)
                             )
                             Text(
-                                text = "Show Unassigned Only",
+                                text = "Show Available Only",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
