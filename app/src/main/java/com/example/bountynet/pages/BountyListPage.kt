@@ -9,16 +9,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.bountynet.Objects.Bounty
 import com.example.bountynet.FirebaseHelper
-import com.example.bountynet.R
 import com.google.gson.Gson
-import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 @Composable
 fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostController) {
@@ -53,10 +50,8 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
         val filtered = items.filter {
             (searchText.isEmpty() || it.second.name.contains(searchText, ignoreCase = true)) &&
                     filterList.contains(it.second.planeta) &&
-                    (!showAvailableOnly || it.second.hunter == "None" || it.second.concluida)
+                    (!showAvailableOnly || (it.second.hunter == "None" && !it.second.concluida))
         }
-
-
 
         if (sortProperty == "name") {
             if (sortAscending) filtered.sortedBy { it.second.name.lowercase() } else filtered.sortedByDescending { it.second.name.lowercase() }
@@ -72,7 +67,7 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
         when {
             isLoading -> {
                 CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center),
+                    modifier = modifier.align(Alignment.Center),
                     color = MaterialTheme.colorScheme.primary
                 )
             }
@@ -129,7 +124,7 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
                                     style = MaterialTheme.typography.bodySmall)
                             }
                             TextButton(onClick = { sortAscending = !sortAscending }) {
-                                Text(if (sortAscending) "Asc" else "Desc", color = MaterialTheme.colorScheme.tertiary,
+                                Text(if (sortAscending) "ASC" else "DESC", color = MaterialTheme.colorScheme.tertiary,
                                     style = MaterialTheme.typography.bodySmall)
                             }
                         }

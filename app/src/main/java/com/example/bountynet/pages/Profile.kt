@@ -31,7 +31,9 @@ import com.google.gson.Gson
 @Composable
 fun Profile(modifier: Modifier = Modifier, userId: String, navHostController: NavHostController) {
     var user by remember { mutableStateOf(User()) }
+    // State for loading
     var isLoading by remember { mutableStateOf(true) }
+    // State for errors
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
     FirebaseHelper.getObjectById(
@@ -55,7 +57,7 @@ fun Profile(modifier: Modifier = Modifier, userId: String, navHostController: Na
         when {
             isLoading -> {
                 CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center),
+                    modifier = modifier.align(Alignment.Center),
                     color = MaterialTheme.colorScheme.primary
                 )
             }

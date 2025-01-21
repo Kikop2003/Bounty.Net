@@ -2,7 +2,9 @@ package com.example.bountynet.pages
 
 
 import android.Manifest
+import android.content.Context
 import android.content.Context.SENSOR_SERVICE
+import android.content.Context.VIBRATOR_MANAGER_SERVICE
 import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -10,11 +12,17 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.location.Location
 import android.location.Location.distanceBetween
+import android.os.Build
+import android.os.CombinedVibration
 import android.os.Looper
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -29,6 +37,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
@@ -36,6 +45,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.navigation.NavHostController
 import com.example.bountynet.FirebaseHelper
 import com.example.bountynet.Objects.Bounty
@@ -109,9 +119,9 @@ fun Current(
     when {
         isLoading -> {
             // Circular Progress Indicator for loading state
-            Box(modifier = Modifier.fillMaxSize()) {
+            Box(modifier = modifier.fillMaxSize()) {
                 CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
+                    modifier = modifier.align(Alignment.Center)
                 )
             }
         }
@@ -119,19 +129,19 @@ fun Current(
             if (permissionGranted) {
                 GoogleMapsScreen(modifier,navHostController, bounty!!, userId)
             } else {
-                Box(modifier = Modifier.fillMaxSize()) {
+                Box(modifier = modifier.fillMaxSize()) {
                     Text(
                         text = "Permission for fine Location not granted",
-                        modifier = Modifier.align(Alignment.Center)
+                        modifier = modifier.align(Alignment.Center)
                     )
                 }
             }
         }
         failure -> {
-            Box(modifier = Modifier.fillMaxSize()) {
+            Box(modifier = modifier.fillMaxSize()) {
                 Text(
                     text = text,
-                    modifier = Modifier.align(Alignment.Center)
+                    modifier = modifier.align(Alignment.Center)
                 )
             }
         }
@@ -230,7 +240,7 @@ fun GoogleMapsScreen(
         Box {
             if (bounty.planeta == "Earth") {
                 GoogleMap(
-                    modifier = Modifier.fillMaxSize(), // Replace with your specific modifier if needed
+                    modifier = modifier.fillMaxSize(), // Replace with your specific modifier if needed
                     cameraPositionState = cameraPositionState
                 ) {
                     userLocation.value?.let {
@@ -254,13 +264,134 @@ fun GoogleMapsScreen(
                 }
             }else{
                 val sensorManager = context.getSystemService(SENSOR_SERVICE) as SensorManager
-                ArrowScreen(
-                    currentLat = userLocation.value?.latitude ?: 0.0,
-                    currentLng = userLocation.value?.longitude ?: 0.0,
-                    destinationLat = destination.latitude,
-                    destinationLng = destination.longitude,
-                    sensorManager = sensorManager
-                )
+                if(bounty.planeta == "Mars"){
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .paint(painterResource(id = R.drawable.mars_texture),
+                                contentScale = androidx.compose.ui.layout.ContentScale.FillBounds)
+                    ) {
+                        ArrowScreen(
+                            currentLat = userLocation.value?.latitude ?: 0.0,
+                            currentLng = userLocation.value?.longitude ?: 0.0,
+                            destinationLat = destination.latitude,
+                            destinationLng = destination.longitude,
+                            sensorManager = sensorManager
+                        )
+                    }
+                }
+                if(bounty.planeta == "Jupiter"){
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .paint(painterResource(id = R.drawable.jupiter_texture),
+                                contentScale = androidx.compose.ui.layout.ContentScale.FillBounds)
+                    ) {
+                        ArrowScreen(
+                            currentLat = userLocation.value?.latitude ?: 0.0,
+                            currentLng = userLocation.value?.longitude ?: 0.0,
+                            destinationLat = destination.latitude,
+                            destinationLng = destination.longitude,
+                            sensorManager = sensorManager
+                        )
+                    }
+                }
+                if(bounty.planeta == "Saturn"){
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .paint(painterResource(id = R.drawable.saturn_texture),
+                                contentScale = androidx.compose.ui.layout.ContentScale.FillBounds)
+                    ) {
+                        ArrowScreen(
+                            currentLat = userLocation.value?.latitude ?: 0.0,
+                            currentLng = userLocation.value?.longitude ?: 0.0,
+                            destinationLat = destination.latitude,
+                            destinationLng = destination.longitude,
+                            sensorManager = sensorManager
+                        )
+                    }
+                }
+                if (bounty.planeta == "Venus"){
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .paint(painterResource(id = R.drawable.venus_texture),
+                                contentScale = androidx.compose.ui.layout.ContentScale.FillBounds)
+                    ) {
+                        ArrowScreen(
+                            currentLat = userLocation.value?.latitude ?: 0.0,
+                            currentLng = userLocation.value?.longitude ?: 0.0,
+                            destinationLat = destination.latitude,
+                            destinationLng = destination.longitude,
+                            sensorManager = sensorManager
+                        )
+                    }
+                }
+                if (bounty.planeta == "Mustafar"){
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .paint(painterResource(id = R.drawable.mustafar_texture),
+                                contentScale = androidx.compose.ui.layout.ContentScale.FillBounds)
+                    ) {
+                        ArrowScreen(
+                            currentLat = userLocation.value?.latitude ?: 0.0,
+                            currentLng = userLocation.value?.longitude ?: 0.0,
+                            destinationLat = destination.latitude,
+                            destinationLng = destination.longitude,
+                            sensorManager = sensorManager
+                        )
+                    }
+                }
+                if (bounty.planeta == "Tatooine"){
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .paint(painterResource(id = R.drawable.tatooine_texture),
+                                contentScale = androidx.compose.ui.layout.ContentScale.FillBounds)
+                    ) {
+                        ArrowScreen(
+                            currentLat = userLocation.value?.latitude ?: 0.0,
+                            currentLng = userLocation.value?.longitude ?: 0.0,
+                            destinationLat = destination.latitude,
+                            destinationLng = destination.longitude,
+                            sensorManager = sensorManager
+                        )
+                    }
+                }
+                if (bounty.planeta == "Kepler452b"){
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .paint(painterResource(id = R.drawable.kepler_texture),
+                                contentScale = androidx.compose.ui.layout.ContentScale.FillBounds)
+                    ) {
+                        ArrowScreen(
+                            currentLat = userLocation.value?.latitude ?: 0.0,
+                            currentLng = userLocation.value?.longitude ?: 0.0,
+                            destinationLat = destination.latitude,
+                            destinationLng = destination.longitude,
+                            sensorManager = sensorManager
+                        )
+                    }
+                }
+                if (bounty.planeta == "Vormir"){
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .paint(painterResource(id = R.drawable.vormir_texture),
+                                contentScale = androidx.compose.ui.layout.ContentScale.FillBounds)
+                    ) {
+                        ArrowScreen(
+                            currentLat = userLocation.value?.latitude ?: 0.0,
+                            currentLng = userLocation.value?.longitude ?: 0.0,
+                            destinationLat = destination.latitude,
+                            destinationLng = destination.longitude,
+                            sensorManager = sensorManager
+                        )
+                    }
+                }
             }
             Text(
                 modifier = Modifier
@@ -268,13 +399,15 @@ fun GoogleMapsScreen(
                     .align(Alignment.BottomCenter)
                     .background(Color.Black) // Set the background color to black
                     .padding(8.dp), // Add some padding around the text to make it more readable
-                text = "$results m",
+                text = adapt(results),
                 color = Color.White, // Set the text color to white to contrast against the black background
                 fontWeight = FontWeight.Bold // Make the text bold
             )
             if (showButton) {
+                vibratePhone(context)
                 Button(
                     onClick = {
+
                         navController.navigate("photo")
                               },
                     modifier = Modifier
@@ -287,6 +420,27 @@ fun GoogleMapsScreen(
         }
     }
 }
+
+fun adapt(distance: Float): String {
+    return if(distance < 1000){
+        "%.0f km".format(distance/1000)
+    }else{
+        "%.1f km".format(distance/1000)
+    }
+}
+
+
+fun vibratePhone(context: Context) {
+    val vibrator = getSystemService(context, Vibrator::class.java)
+    vibrator?.let{
+        if(it.hasVibrator()){
+            val vibrationEffect = VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE)
+            it.vibrate(vibrationEffect)
+        }
+    }
+
+}
+
 
 @Composable
 fun ArrowScreen(
@@ -333,7 +487,6 @@ fun ArrowScreen(
                     direction = (bearing - azimuth + 360) % 360
                 }
             }
-
             override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
         }
     }
