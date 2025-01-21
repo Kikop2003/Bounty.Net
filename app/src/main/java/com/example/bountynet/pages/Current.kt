@@ -264,133 +264,30 @@ fun GoogleMapsScreen(
                 }
             }else{
                 val sensorManager = context.getSystemService(SENSOR_SERVICE) as SensorManager
-                if(bounty.planeta == "Mars"){
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .paint(painterResource(id = R.drawable.mars_texture),
-                                contentScale = androidx.compose.ui.layout.ContentScale.FillBounds)
-                    ) {
-                        ArrowScreen(
-                            currentLat = userLocation.value?.latitude ?: 0.0,
-                            currentLng = userLocation.value?.longitude ?: 0.0,
-                            destinationLat = destination.latitude,
-                            destinationLng = destination.longitude,
-                            sensorManager = sensorManager
-                        )
-                    }
+                val id = when (bounty.planeta) {
+                    "Mars" -> R.drawable.mars_texture
+                    "Jupiter" -> R.drawable.jupiter_texture
+                    "Saturn" -> R.drawable.saturn_texture
+                    "Venus" -> R.drawable.venus_texture
+                    "Mustafar" -> R.drawable.mustafar_texture
+                    "Tatooine" -> R.drawable.tatooine_texture
+                    "Kepler452b" -> R.drawable.kepler_texture
+                    "Vormir" -> R.drawable.vormir_texture
+                    else -> R.drawable.logo
                 }
-                if(bounty.planeta == "Jupiter"){
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .paint(painterResource(id = R.drawable.jupiter_texture),
-                                contentScale = androidx.compose.ui.layout.ContentScale.FillBounds)
-                    ) {
-                        ArrowScreen(
-                            currentLat = userLocation.value?.latitude ?: 0.0,
-                            currentLng = userLocation.value?.longitude ?: 0.0,
-                            destinationLat = destination.latitude,
-                            destinationLng = destination.longitude,
-                            sensorManager = sensorManager
-                        )
-                    }
-                }
-                if(bounty.planeta == "Saturn"){
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .paint(painterResource(id = R.drawable.saturn_texture),
-                                contentScale = androidx.compose.ui.layout.ContentScale.FillBounds)
-                    ) {
-                        ArrowScreen(
-                            currentLat = userLocation.value?.latitude ?: 0.0,
-                            currentLng = userLocation.value?.longitude ?: 0.0,
-                            destinationLat = destination.latitude,
-                            destinationLng = destination.longitude,
-                            sensorManager = sensorManager
-                        )
-                    }
-                }
-                if (bounty.planeta == "Venus"){
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .paint(painterResource(id = R.drawable.venus_texture),
-                                contentScale = androidx.compose.ui.layout.ContentScale.FillBounds)
-                    ) {
-                        ArrowScreen(
-                            currentLat = userLocation.value?.latitude ?: 0.0,
-                            currentLng = userLocation.value?.longitude ?: 0.0,
-                            destinationLat = destination.latitude,
-                            destinationLng = destination.longitude,
-                            sensorManager = sensorManager
-                        )
-                    }
-                }
-                if (bounty.planeta == "Mustafar"){
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .paint(painterResource(id = R.drawable.mustafar_texture),
-                                contentScale = androidx.compose.ui.layout.ContentScale.FillBounds)
-                    ) {
-                        ArrowScreen(
-                            currentLat = userLocation.value?.latitude ?: 0.0,
-                            currentLng = userLocation.value?.longitude ?: 0.0,
-                            destinationLat = destination.latitude,
-                            destinationLng = destination.longitude,
-                            sensorManager = sensorManager
-                        )
-                    }
-                }
-                if (bounty.planeta == "Tatooine"){
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .paint(painterResource(id = R.drawable.tatooine_texture),
-                                contentScale = androidx.compose.ui.layout.ContentScale.FillBounds)
-                    ) {
-                        ArrowScreen(
-                            currentLat = userLocation.value?.latitude ?: 0.0,
-                            currentLng = userLocation.value?.longitude ?: 0.0,
-                            destinationLat = destination.latitude,
-                            destinationLng = destination.longitude,
-                            sensorManager = sensorManager
-                        )
-                    }
-                }
-                if (bounty.planeta == "Kepler452b"){
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .paint(painterResource(id = R.drawable.kepler_texture),
-                                contentScale = androidx.compose.ui.layout.ContentScale.FillBounds)
-                    ) {
-                        ArrowScreen(
-                            currentLat = userLocation.value?.latitude ?: 0.0,
-                            currentLng = userLocation.value?.longitude ?: 0.0,
-                            destinationLat = destination.latitude,
-                            destinationLng = destination.longitude,
-                            sensorManager = sensorManager
-                        )
-                    }
-                }
-                if (bounty.planeta == "Vormir"){
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .paint(painterResource(id = R.drawable.vormir_texture),
-                                contentScale = androidx.compose.ui.layout.ContentScale.FillBounds)
-                    ) {
-                        ArrowScreen(
-                            currentLat = userLocation.value?.latitude ?: 0.0,
-                            currentLng = userLocation.value?.longitude ?: 0.0,
-                            destinationLat = destination.latitude,
-                            destinationLng = destination.longitude,
-                            sensorManager = sensorManager
-                        )
-                    }
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .paint(painterResource(id = id),
+                            contentScale = androidx.compose.ui.layout.ContentScale.FillBounds)
+                ) {
+                    ArrowScreen(
+                        currentLat = userLocation.value?.latitude ?: 0.0,
+                        currentLng = userLocation.value?.longitude ?: 0.0,
+                        destinationLat = destination.latitude,
+                        destinationLng = destination.longitude,
+                        sensorManager = sensorManager
+                    )
                 }
             }
             Text(
@@ -438,7 +335,6 @@ fun vibratePhone(context: Context) {
             it.vibrate(vibrationEffect)
         }
     }
-
 }
 
 
