@@ -235,7 +235,7 @@ fun ExpandableList(userId: String, navHostController: NavHostController) {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = item.second.name.take(17),
+                        text = if (item.second.name.length > 17) "${item.second.name.take(17)}..." else item.second.name,
                         style = MaterialTheme.typography.bodyMedium.copy(
                             textDecoration = if (item.second.concluida) TextDecoration.LineThrough else null
                         ),
