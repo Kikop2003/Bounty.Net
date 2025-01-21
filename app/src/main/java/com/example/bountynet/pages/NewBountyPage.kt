@@ -37,6 +37,7 @@ fun CreateBountyPage(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background // Use theme background
     ) {
+        var loading by remember { mutableStateOf(false) }
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -138,9 +139,12 @@ fun CreateBountyPage(
                     Text("Cancel")
                 }
 
-                // Create Button
                 TextButton(
                     onClick = {
+                        if (loading) return@TextButton // Prevent action if already loading
+
+                        // Start loading
+                        loading = true
 
                         val trimmedName = name.trim()
                         val rewardValue = reward.toIntOrNull()
@@ -162,12 +166,11 @@ fun CreateBountyPage(
                                 attribute = "creds",
                                 onSuccess = { retCreds ->
                                     creds = (retCreds as Long).toInt()
-                                    // Check if the user has enough credits
                                     if (rewardValue!! > creds) {
                                         errorMoney = true
                                         Toast.makeText(navController.context, "Not enough credits", Toast.LENGTH_SHORT).show()
+                                        loading = false // Stop loading
                                     } else {
-                                        // Deduct credits and update them in Firebase
                                         creds -= rewardValue
                                         FirebaseHelper.updateObjectAttribute(
                                             path = "users",
@@ -177,10 +180,10 @@ fun CreateBountyPage(
                                             onFailure = { text ->
                                                 Toast.makeText(navController.context, text, Toast.LENGTH_SHORT).show()
                                                 errorMoney = true
+                                                loading = false // Stop loading
                                             }
                                         )
 
-                                        // After successfully updating credits, create bounty
                                         if (!errorMoney) {
                                             val bounty = Bounty(
                                                 name = trimmedName,
@@ -191,30 +194,33 @@ fun CreateBountyPage(
                                                 lon = longitudeValue!!
                                             )
 
-                                            // Add bounty to the database
                                             FirebaseHelper.addToDatabase(
                                                 path = "bountys",
                                                 item = bounty,
                                                 onSuccess = {
-                                                    navController.popBackStack()  // Navigate back on success
+                                                    loading = false // Stop loading
+                                                    navController.popBackStack() // Navigate back
                                                 },
                                                 onFailure = { error ->
-                                                    // Handle error when adding bounty
                                                     Toast.makeText(navController.context, "Failed to add bounty", Toast.LENGTH_SHORT).show()
+                                                    loading = false // Stop loading
                                                 }
                                             )
                                         }
                                     }
                                 },
-                                onFailure = {error ->
-                                    // Handle error when fetching user credentials
+                                onFailure = { error ->
                                     Toast.makeText(navController.context, "Failed to retrieve user credits", Toast.LENGTH_SHORT).show()
+                                    loading = false // Stop loading
                                 }
                             )
+                        } else {
+                            loading = false // Stop loading if validation fails
                         }
-                    }
+                    },
+                    enabled = !loading // Disable the button while loading
                 ) {
-                    Text("Create")
+                    Text(if (loading) "Creating..." else "Create")
                 }
 
             }

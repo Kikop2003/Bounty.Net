@@ -4,7 +4,6 @@ package com.example.bountynet.pages
 import android.Manifest
 import android.content.Context
 import android.content.Context.SENSOR_SERVICE
-import android.content.Context.VIBRATOR_MANAGER_SERVICE
 import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -12,17 +11,13 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.location.Location
 import android.location.Location.distanceBetween
-import android.os.Build
-import android.os.CombinedVibration
 import android.os.Looper
 import android.os.VibrationEffect
 import android.os.Vibrator
-import android.os.VibratorManager
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
