@@ -35,6 +35,7 @@ object FirebaseHelper {
         )
     }
 
+
     fun concludeBounty(
         userId: String
     ){
@@ -252,6 +253,29 @@ object FirebaseHelper {
                 refUser.child("currentBountyId").setValue(bountyId)
                 callback("Bounty accepted successfully")
             }
+        }
+    }
+
+    fun releaseBounty(
+        bountyId: String,
+        userId: String,
+        callback: (String) -> Unit
+    ) {
+        val refUser = database.child("users").child(userId)
+        val refBounty = database.child("bountys").child(bountyId)
+
+        refBounty.child("hunter").get().addOnSuccessListener { snapshot ->
+            val hunterId = snapshot.getValue(String::class.java)
+
+            if (hunterId != userId) {
+                callback("User is not assigned to this bounty")
+            } else {
+                refBounty.child("hunter").setValue("None")// Remove the hunter from the bounty
+                refUser.child("currentBountyId").setValue("ERROR") // Reset user's current bounty
+                callback("Bounty released successfully")
+            }
+        }.addOnFailureListener {
+            callback("Failed to release bounty: ${it.message}")
         }
     }
 }
