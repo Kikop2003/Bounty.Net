@@ -17,6 +17,7 @@ private val DarkColorScheme = darkColorScheme(
     tertiary = VibrantGolden,
     background = DarkBlue, // Preto profundo com tom azulado
     surface = DarkPurple, // Roxo escuro
+    surfaceVariant = Purple,
     onPrimary = Black, // Preto para contraste
     onSecondary = White, // Branco para contraste
     onTertiary = Black, // Preto para contraste

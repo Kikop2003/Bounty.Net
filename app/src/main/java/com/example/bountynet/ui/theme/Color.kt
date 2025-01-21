@@ -10,3 +10,4 @@ val DarkPurple = Color(0xFF1C0048)
 val Black = Color.Black
 val White = Color.White
 val LightGray = Color(0xFFEDEDED)
+val Purple = Color(0xFF371E70)
