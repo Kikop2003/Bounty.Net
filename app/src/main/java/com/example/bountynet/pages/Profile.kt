@@ -313,7 +313,7 @@ fun ExpandableList(userId: String, navHostController: NavHostController) {
                         color = if (item.second.concluida) Color.Gray else MaterialTheme.colorScheme.primary
                     )
                     Text(
-                        text = if (item.second.concluida) "Concluded" else "In Progress...",
+                        text = if (item.second.concluida) "Concluded" else if(item.second.hunter == "None") "Created" else "Accepted",
                         style = MaterialTheme.typography.bodySmall.copy(
                             textDecoration = if (item.second.concluida) TextDecoration.LineThrough else null
                         ),
