@@ -254,4 +254,15 @@ object FirebaseHelper {
             }
         }
     }
+
+    fun changeProfilePictureIndex(userId: String, newIndex: Int, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
+        val userRef = database.child("users").child(userId)
+        userRef.child("profilePictureIndex").setValue(newIndex)
+            .addOnSuccessListener {
+                onSuccess() // Notify success
+            }
+            .addOnFailureListener { exception ->
+                onFailure("Error updating profile picture index: ${exception.message}") // Handle failure
+            }
+    }
 }

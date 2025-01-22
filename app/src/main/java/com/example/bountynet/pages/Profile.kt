@@ -1,5 +1,6 @@
 package com.example.bountynet.pages
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -7,6 +8,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -31,17 +34,20 @@ import com.google.gson.Gson
 @Composable
 fun Profile(modifier: Modifier = Modifier, userId: String, navHostController: NavHostController) {
     var user by remember { mutableStateOf(User()) }
-    // State for loading
     var isLoading by remember { mutableStateOf(true) }
-    // State for errors
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
+    // Track the current profile picture index in a state so that it triggers recomposition
+    var profilePictureIndex by remember { mutableStateOf(user.profilePictureIndex) }
+
+    // Fetch user data
     FirebaseHelper.getObjectById(
         path = "users",
         id = userId,
         type = User::class.java,
         onSuccess = { userRet ->
             user = userRet
+            profilePictureIndex = userRet.profilePictureIndex // Set initial profile picture index
             isLoading = false
         },
         onFailure = { error ->
@@ -49,6 +55,15 @@ fun Profile(modifier: Modifier = Modifier, userId: String, navHostController: Na
             isLoading = false
         }
     )
+
+    // Dynamically update the profile picture whenever profilePictureIndex changes
+    val profilePictureResId = when (profilePictureIndex) {
+        1 -> R.drawable.profile_picture_1
+        2 -> R.drawable.profile_picture_2
+        3 -> R.drawable.profile_picture_3
+        4 -> R.drawable.profile_picture_4
+        else -> R.drawable.profile_picture_1 // Default image if index is invalid
+    }
 
     Box(
         modifier = modifier.fillMaxSize(),
@@ -92,16 +107,45 @@ fun Profile(modifier: Modifier = Modifier, userId: String, navHostController: Na
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.profile_picture_1),
-                            contentDescription = "Profile Image",
-                            modifier = Modifier
-                                .size(200.dp)
-                                .graphicsLayer(shape = CircleShape, clip = true)
-                                .clickable {
-                                    changeUserImage()
-                                }
-                        )
+                        Box(
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Image(
+                                painter = painterResource(id = profilePictureResId),
+                                contentDescription = "Profile Image",
+                                modifier = Modifier
+                                    .size(200.dp)
+                                    .clip(CircleShape)
+                                    .clickable {
+                                        // Update the profile picture index
+                                        changeUserImage(
+                                            userId,
+                                            user,
+                                            profilePictureIndex
+                                        ) { newIndex ->
+                                            profilePictureIndex = newIndex
+                                        }
+                                    }
+                            )
+                            Icon(
+                                imageVector = Icons.Filled.Edit,
+                                contentDescription = "Edit Profile Picture",
+                                modifier = Modifier
+                                    .size(30.dp)
+                                    .align(Alignment.BottomEnd)
+                                    .padding(8.dp)
+                                    .clickable {
+                                        changeUserImage(
+                                            userId,
+                                            user,
+                                            profilePictureIndex
+                                        ) { newIndex ->
+                                            profilePictureIndex = newIndex
+                                        }
+                                    },
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
 
                         Spacer(modifier = Modifier.height(8.dp))
 
@@ -135,12 +179,8 @@ fun Profile(modifier: Modifier = Modifier, userId: String, navHostController: Na
                                     path = "bountys",
                                     id = user.currentBountyId,
                                     type = Bounty::class.java,
-                                    onSuccess = { bounty ->
-                                        currentBounty = bounty
-                                    },
-                                    onFailure = { error ->
-                                        currentBounty = null // Handle error appropriately
-                                    }
+                                    onSuccess = { bounty -> currentBounty = bounty },
+                                    onFailure = { error -> currentBounty = null }
                                 )
                             }
 
@@ -154,7 +194,7 @@ fun Profile(modifier: Modifier = Modifier, userId: String, navHostController: Na
                                     }
                                 )
                             } ?: Text(
-                                text = "Loading...",
+                                text = "No Active Bounty",
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = MaterialTheme.colorScheme.secondary
                             )
@@ -174,9 +214,25 @@ fun Profile(modifier: Modifier = Modifier, userId: String, navHostController: Na
     }
 }
 
-fun changeUserImage() {
-    TODO("Not yet implemented")
+fun changeUserImage(userId: String, user: User, currentProfilePictureIndex: Int, onProfilePictureUpdated: (Int) -> Unit) {
+    // Increment the profile picture index, ensuring it's between 1 and 4
+    val newProfilePictureIndex = (currentProfilePictureIndex % 4) + 1
 
+    // Update the local object (if needed)
+    user.profilePictureIndex = newProfilePictureIndex
+
+    // Now update the Firebase database with the new profilePictureIndex
+    FirebaseHelper.changeProfilePictureIndex(userId, newProfilePictureIndex,
+        onSuccess = {
+            // Successfully updated the profilePictureIndex in Firebase
+            onProfilePictureUpdated(newProfilePictureIndex) // Notify the composable to update
+            println("Profile picture index updated successfully in Firebase")
+        },
+        onFailure = { errorMessage ->
+            // Handle failure to update the index
+            println("Failed to update profile picture index: $errorMessage")
+        }
+    )
 }
 
 @Composable
@@ -254,54 +310,6 @@ fun ExpandableList(userId: String, navHostController: NavHostController) {
     }
 }
 
-@Composable
-fun DisplayBountyPhoto(bountyId: String) {
-    var photoUrl by remember { mutableStateOf<String?>(null) }
-
-    LaunchedEffect(bountyId) {
-        getPhotoUrlFromDatabase(bountyId, onSuccess = { url ->
-            photoUrl = url
-        }, onFailure = { e ->
-            // Handle error
-        })
-    }
-
-    if (photoUrl != null) {
-        val painter = rememberAsyncImagePainter(photoUrl)
-        Image(
-            painter = painter,
-            contentDescription = "Bounty Photo",
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp)
-                .padding(16.dp)
-        )
-    } else {
-        Text(
-            text = "Loading photo...",
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-    }
-}
-
-fun getPhotoUrlFromDatabase(bountyId: String, onSuccess: (String?) -> Unit, onFailure: (Exception) -> Unit) {
-    val db = Firebase.firestore
-
-    db.collection("bounties").document(bountyId)
-        .get()
-        .addOnSuccessListener { document ->
-            if (document.exists()) {
-                val photoUrl = document.getString("photoUrl")
-                onSuccess(photoUrl)
-            } else {
-                onSuccess(null)
-            }
-        }
-        .addOnFailureListener { e ->
-            onFailure(e)
-        }
-}
 
 fun navigateToBountyDetails(bountyPair: Pair<String, Bounty>, navHostController: NavHostController) {
     val gson = Gson()
