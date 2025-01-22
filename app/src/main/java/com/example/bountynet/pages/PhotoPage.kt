@@ -61,7 +61,8 @@ fun PhotoPage(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(backgroundColor)  // Apply background color from the theme
+            .background(backgroundColor)
+            .windowInsetsPadding(WindowInsets.systemBars),
     ) {
         Column(
             modifier = Modifier
