@@ -94,8 +94,7 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
                             onValueChange = { searchText = it },
                             placeholder = { Text("Search bounties...", style = MaterialTheme.typography.titleLarge) },
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
+                                .fillMaxWidth(),
                             singleLine = true,
                             colors = TextFieldDefaults.colors(
                                 focusedContainerColor = MaterialTheme.colorScheme.surface,

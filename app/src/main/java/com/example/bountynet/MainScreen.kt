@@ -31,8 +31,8 @@ fun MainScreen(modifier: Modifier = Modifier,userId: String, navController: NavH
 
     val navItems = listOf(
         NavItem("List",Icons.Default.AllInbox),
-        NavItem("Current",Icons.Default.PlayArrow, "meh"),
-        NavItem("Profile",Icons.Default.Face, "mih")
+        NavItem("Current",Icons.Default.PlayArrow),
+        NavItem("Profile",Icons.Default.Face)
     )
     val currentBackStackEntry = navController.currentBackStackEntry
     val savedIndex = currentBackStackEntry?.savedStateHandle?.get<Int>("selectedIndex")
@@ -50,15 +50,7 @@ fun MainScreen(modifier: Modifier = Modifier,userId: String, navController: NavH
                             navController.currentBackStackEntry?.savedStateHandle?.set("selectedIndex", index)
                         },
                         icon =  {
-                            BadgedBox(badge = {
-                                if (navItem.badgeText != null){
-                                    Badge() {
-                                        Text(text = navItem.badgeText.toString())
-                                    }
-                                }
-                            }){
-                                Icon(imageVector = navItem.icon, contentDescription = "Icon")
-                            }
+                            Icon(imageVector = navItem.icon, contentDescription = "Icon")
                         },
                         label = { Text(text = navItem.label) },
                     )

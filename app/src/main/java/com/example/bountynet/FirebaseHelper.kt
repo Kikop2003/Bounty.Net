@@ -63,7 +63,6 @@ object FirebaseHelper {
 
                                     // Update bounty data
                                     refBounty.child("concluida").setValue(true)
-                                    refBounty.child("tempo").setValue("2")
                                 }
 
                                 override fun onCancelled(error: DatabaseError) {

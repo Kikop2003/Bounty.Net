@@ -131,7 +131,7 @@ fun Profile(modifier: Modifier = Modifier, userId: String, navHostController: Na
                                 imageVector = Icons.Filled.Edit,
                                 contentDescription = "Edit Profile Picture",
                                 modifier = Modifier
-                                    .size(30.dp)
+                                    .size(35.dp)
                                     .align(Alignment.BottomEnd)
                                     .padding(8.dp)
                                     .clickable {
@@ -143,7 +143,7 @@ fun Profile(modifier: Modifier = Modifier, userId: String, navHostController: Na
                                             profilePictureIndex = newIndex
                                         }
                                     },
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = MaterialTheme.colorScheme.onBackground
                             )
                         }
 
@@ -161,7 +161,25 @@ fun Profile(modifier: Modifier = Modifier, userId: String, navHostController: Na
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = 16.dp),
+                            .padding(start = 16.dp)
+                            .clickable { // Make the entire row clickable
+                                if (user.currentBountyId.isNotEmpty()) {
+                                    FirebaseHelper.getObjectById(
+                                        path = "bountys",
+                                        id = user.currentBountyId,
+                                        type = Bounty::class.java,
+                                        onSuccess = { bounty ->
+                                            navigateToBountyDetails(
+                                                bountyPair = Pair(user.currentBountyId, bounty),
+                                                navHostController = navHostController
+                                            )
+                                        },
+                                        onFailure = { error ->
+                                            Log.e("Profile", "Failed to fetch current bounty: $error")
+                                        }
+                                    )
+                                }
+                            },
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -188,10 +206,7 @@ fun Profile(modifier: Modifier = Modifier, userId: String, navHostController: Na
                                 Text(
                                     text = bounty.name,
                                     style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.secondary,
-                                    modifier = Modifier.clickable {
-                                        navigateToBountyDetails(bountyPair = Pair(user.currentBountyId, bounty), navHostController = navHostController)
-                                    }
+                                    color = MaterialTheme.colorScheme.secondary
                                 )
                             } ?: Text(
                                 text = "No Active Bounty",
@@ -206,6 +221,7 @@ fun Profile(modifier: Modifier = Modifier, userId: String, navHostController: Na
                             )
                         }
                     }
+
 
                     ExpandableList(userId = userId, navHostController = navHostController)
                 }

@@ -124,20 +124,33 @@ fun BountyDetailPage(pair: Pair<String, Bounty>, navController: NavHostControlle
                 }
 
                 if (bounty.hunter == "None") {
-                    Button(onClick = {
+                    Button(
+                        onClick = {
                         FirebaseHelper.acceptBounty(id, userId, callback = { text ->
                             Toast.makeText(navController.context, text, Toast.LENGTH_SHORT).show()
-                        })
-                    }) {
-                        Text("Accept")
+                            })
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary)
+                    ) {
+                        Text(
+                            text ="Accept",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onTertiary
+                        )
                     }
-                } else if (bounty.hunter == userId) {
+                } else if (bounty.hunter == userId && !bounty.concluida) {
                     Button(onClick = {
                         FirebaseHelper.releaseBounty(id, userId, callback = { text ->
                             Toast.makeText(navController.context, text, Toast.LENGTH_SHORT).show()
-                        })
-                    }) {
-                        Text("Cancel")
+                            })
+                        },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+                    ) {
+                        Text(
+                            text = "Give Up",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSecondary
+                        )
                     }
                 }
             }
@@ -202,7 +215,7 @@ fun DisplayBountyPhoto(bountyId: String) {
 fun getPhotoUrlFromDatabase(bountyId: String, onSuccess: (String?) -> Unit, onFailure: (Exception) -> Unit) {
     val db = Firebase.firestore
 
-    db.collection("bounties").document(bountyId)
+    db.collection("bountys").document(bountyId)
         .get()
         .addOnSuccessListener { document ->
             if (document.exists()) {

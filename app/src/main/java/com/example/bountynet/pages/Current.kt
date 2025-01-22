@@ -407,7 +407,7 @@ fun ArrowScreen(
             painter = painterResource(id = R.drawable.arrow),
             contentDescription = "Arrow pointing to destination",
             modifier = Modifier
-                .size(100.dp)
+                .size(256.dp)
                 .graphicsLayer { rotationZ = direction }
         )
 
