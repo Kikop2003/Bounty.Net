@@ -156,8 +156,8 @@ fun Profile(modifier: Modifier = Modifier, userId: String, navHostController: Na
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(start = 16.dp)
-                            .clickable { // Make the entire row clickable
+                            .clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+                            .clickable {
                                 if (user.currentBountyId.isNotEmpty()) {
                                     FirebaseHelper.getObjectById(
                                         path = "bountys",
@@ -174,7 +174,8 @@ fun Profile(modifier: Modifier = Modifier, userId: String, navHostController: Na
                                         }
                                     )
                                 }
-                            },
+                            }
+                            .padding(16.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -263,10 +264,9 @@ fun ExpandableList(userId: String, navHostController: NavHostController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { isExpanded = !isExpanded }
             .clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+            .clickable { isExpanded = !isExpanded }
             .background(if (isExpanded) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surface)
-//            .background(MaterialTheme.colorScheme.surface)
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
@@ -294,6 +294,7 @@ fun ExpandableList(userId: String, navHostController: NavHostController) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
                         .clickable {
                             navigateToBountyDetails(bountyPair = item, navHostController = navHostController)
                         }
@@ -309,7 +310,7 @@ fun ExpandableList(userId: String, navHostController: NavHostController) {
                         color = if (item.second.concluida) Color.Gray else MaterialTheme.colorScheme.primary
                     )
                     Text(
-                        text = if (item.second.concluida) "Concluded" else if(item.second.hunter == "None") "Created" else "In Progress...",
+                        text = if (item.second.concluida) "Concluded" else if(item.second.hunter == "None") "Created" else "Accepted",
                         style = MaterialTheme.typography.bodySmall.copy(),
                         color = if (item.second.concluida) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary
                     )
