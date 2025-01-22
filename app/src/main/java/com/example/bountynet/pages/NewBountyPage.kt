@@ -24,9 +24,11 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.TextFieldDefaults.colors
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+
 
 @Composable
 fun CreateBountyPage(
@@ -34,14 +36,14 @@ fun CreateBountyPage(
     userId : String
 ) {
     Surface(
-        modifier = Modifier.fillMaxSize()
-            .windowInsetsPadding(WindowInsets.systemBars),
+        modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background // Use theme background
     ) {
         var loading by remember { mutableStateOf(false) }
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .windowInsetsPadding(WindowInsets.systemBars)
                 .padding(16.dp)
         ) {
             // Title
