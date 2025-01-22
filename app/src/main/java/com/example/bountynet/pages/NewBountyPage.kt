@@ -34,7 +34,8 @@ fun CreateBountyPage(
     userId : String
 ) {
     Surface(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize()
+            .windowInsetsPadding(WindowInsets.systemBars),
         color = MaterialTheme.colorScheme.background // Use theme background
     ) {
         var loading by remember { mutableStateOf(false) }

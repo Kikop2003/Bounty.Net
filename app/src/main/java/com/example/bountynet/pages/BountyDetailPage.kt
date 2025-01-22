@@ -20,63 +20,56 @@ fun BountyDetailPage(pair: Pair<String, Bounty>, navController: NavHostControlle
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            horizontalAlignment = Alignment.Start
-        ) {
-            Text(
-                text = "Bounty Details",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalAlignment = Alignment.Start
+    ) {
+        Text(
+            text = "Bounty Details",
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
+        )
 
-            DetailRow(label = "Name", value = bounty.name)
-            DetailRow(label = "Reward", value = "$${bounty.reward}")
-            DetailRow(label = "Planet", value = bounty.planeta)
-            DetailRow(label = "Assigned Hunter", value = bounty.hunter)
-            if (bounty.concluida) {
-                DetailRow(label = "Concluded", value = "Yes")
-            }
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)
-            ) {
-                Button(onClick = {
-                    navController.popBackStack()
-                }) {
-                    Text("Go Back")
-                }
-                if (bounty.hunter == "None") {
-                    Button(onClick = {
-                        FirebaseHelper.acceptBounty(id, userId, callback = { text ->
-                            Toast.makeText(navController.context, text, Toast.LENGTH_SHORT).show()
-                        })
-                    }) {
-                        Text("Accept")
-                    }
-                } else if (bounty.hunter == userId) {
-                    Button(onClick = {
-                        FirebaseHelper.releaseBounty(id, userId, callback = { text ->
-                            Toast.makeText(navController.context, text, Toast.LENGTH_SHORT).show()
-                        })
-                    }) {
-                        Text("Cancel")
-                    }
-                }
-            }
+        DetailRow(label = "Name", value = bounty.name)
+        DetailRow(label = "Reward", value = "$${bounty.reward}")
+        DetailRow(label = "Planet", value = bounty.planeta)
+        if(bounty.concluida){
+            DetailRow(label = "Concluded", value = "Yes")
+            DetailRow(label = "Hunter", value = bounty.hunter)
         }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)
+        ) {
+            Button(onClick = {
+                navController.popBackStack()
+            }) {
+                Text("Go Back")
+            }
+            if(bounty.hunter == "None"){
+                Button(onClick = {
+                    FirebaseHelper.acceptBounty(id, userId, callback = { text->
+                        Toast.makeText(navController.context, text, Toast.LENGTH_SHORT).show()})
+                }) {
+                    Text("Accept")
+                }
+            }
+
+        }
+
+
     }
 }
-
+    }
 
 @Composable
 fun DetailRow(label: String, value: String) {

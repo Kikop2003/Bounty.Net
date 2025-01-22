@@ -114,7 +114,8 @@ fun Current(
     when {
         isLoading -> {
             // Circular Progress Indicator for loading state
-            Box(modifier = modifier.fillMaxSize()) {
+            Box(modifier = modifier.fillMaxSize()
+                .windowInsetsPadding(WindowInsets.systemBars),) {
                 CircularProgressIndicator(
                     modifier = modifier.align(Alignment.Center)
                 )
@@ -124,7 +125,8 @@ fun Current(
             if (permissionGranted) {
                 GoogleMapsScreen(modifier,navHostController, bounty!!, userId)
             } else {
-                Box(modifier = modifier.fillMaxSize()) {
+                Box(modifier = modifier.fillMaxSize()
+                    .windowInsetsPadding(WindowInsets.systemBars),) {
                     Text(
                         text = "Permission for fine Location not granted",
                         modifier = modifier.align(Alignment.Center)
@@ -133,7 +135,8 @@ fun Current(
             }
         }
         failure -> {
-            Box(modifier = modifier.fillMaxSize()) {
+            Box(modifier = modifier.fillMaxSize()
+                .windowInsetsPadding(WindowInsets.systemBars),) {
                 Text(
                     text = text,
                     modifier = modifier.align(Alignment.Center)
@@ -235,7 +238,8 @@ fun GoogleMapsScreen(
         Box {
             if (bounty.planeta == "Earth") {
                 GoogleMap(
-                    modifier = modifier.fillMaxSize(), // Replace with your specific modifier if needed
+                    modifier = modifier.fillMaxSize()
+                        .windowInsetsPadding(WindowInsets.systemBars),
                     cameraPositionState = cameraPositionState
                 ) {
                     userLocation.value?.let {
@@ -396,7 +400,9 @@ fun ArrowScreen(
     }
 
     // Display the arrow
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    Box(modifier = Modifier.fillMaxSize()
+        .windowInsetsPadding(WindowInsets.systemBars)
+        , contentAlignment = Alignment.Center) {
         Image(
             painter = painterResource(id = R.drawable.arrow),
             contentDescription = "Arrow pointing to destination",

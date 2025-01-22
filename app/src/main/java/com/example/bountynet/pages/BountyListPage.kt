@@ -61,7 +61,8 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
     }
 
     Box(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize()
+            .windowInsetsPadding(WindowInsets.systemBars),
         contentAlignment = Alignment.TopCenter
     ) {
         when {
