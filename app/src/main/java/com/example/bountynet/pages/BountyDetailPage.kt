@@ -124,20 +124,20 @@ fun BountyDetailPage(pair: Pair<String, Bounty>, navController: NavHostControlle
                 }
 
                 if (bounty.hunter == "None") {
-                    Button(
-                        onClick = {
-                            FirebaseHelper.acceptBounty(id, userId) { text ->
-                                Toast.makeText(navController.context, text, Toast.LENGTH_SHORT).show()
-                                navController.popBackStack()
-                            }
-                        },
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary)
-                    ) {
-                        Text(
-                            text = "Accept",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onTertiary
-                        )
+                    Button(onClick = {
+                        FirebaseHelper.acceptBounty(id, userId, callback = { text ->
+                            Toast.makeText(navController.context, text, Toast.LENGTH_SHORT).show()
+                        })
+                    }) {
+                        Text("Accept")
+                    }
+                } else if (bounty.hunter == userId) {
+                    Button(onClick = {
+                        FirebaseHelper.releaseBounty(id, userId, callback = { text ->
+                            Toast.makeText(navController.context, text, Toast.LENGTH_SHORT).show()
+                        })
+                    }) {
+                        Text("Cancel")
                     }
                 }
             }
