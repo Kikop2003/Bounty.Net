@@ -21,6 +21,7 @@ import com.example.bountynet.FirebaseHelper
 import com.example.bountynet.Objects.Bounty
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
+import com.google.firebase.storage.storage
 
 @Composable
 fun BountyDetailPage(pair: Pair<String, Bounty>, navController: NavHostController, userId: String) {
@@ -213,19 +214,18 @@ fun DisplayBountyPhoto(bountyId: String) {
 }
 
 fun getPhotoUrlFromDatabase(bountyId: String, onSuccess: (String?) -> Unit, onFailure: (Exception) -> Unit) {
-    val db = Firebase.firestore
+    // Reference to Firebase Storage
+    val storageRef = Firebase.storage.reference
+    val photoRef = storageRef.child("photos/$bountyId.jpg")
 
-    db.collection("bountys").document(bountyId)
-        .get()
-        .addOnSuccessListener { document ->
-            if (document.exists()) {
-                val photoUrl = document.getString("photoUrl")
-                onSuccess(photoUrl)
-            } else {
-                onSuccess(null)
-            }
+    // Get the photo URL
+    photoRef.downloadUrl
+        .addOnSuccessListener { uri ->
+            // Invoke the success callback with the URL
+            onSuccess(uri.toString())
         }
-        .addOnFailureListener { e ->
-            onFailure(e)
+        .addOnFailureListener { exception ->
+            // Invoke the error callback
+            onFailure(exception)
         }
 }
