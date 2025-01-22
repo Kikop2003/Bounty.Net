@@ -65,8 +65,7 @@ fun Profile(modifier: Modifier = Modifier, userId: String, navHostController: Na
     }
 
     Box(
-        modifier = modifier.fillMaxSize()
-            .windowInsetsPadding(WindowInsets.systemBars),
+        modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.TopCenter
     ) {
         when {
