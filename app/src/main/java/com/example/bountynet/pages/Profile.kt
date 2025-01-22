@@ -16,18 +16,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import coil.compose.rememberAsyncImagePainter
 import com.example.bountynet.FirebaseHelper
 import com.example.bountynet.Objects.Bounty
 import com.example.bountynet.Objects.User
 import com.example.bountynet.R
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.firestore
 import com.google.gson.Gson
 
 @Composable
@@ -37,7 +33,7 @@ fun Profile(modifier: Modifier = Modifier, userId: String, navHostController: Na
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
     // Track the current profile picture index in a state so that it triggers recomposition
-    var profilePictureIndex by remember { mutableStateOf(user.profilePictureIndex) }
+    var profilePictureIndex by remember { mutableIntStateOf(user.profilePictureIndex) }
 
     // Fetch user data
     FirebaseHelper.getObjectById(
@@ -313,7 +309,7 @@ fun ExpandableList(userId: String, navHostController: NavHostController) {
                         color = if (item.second.concluida) Color.Gray else MaterialTheme.colorScheme.primary
                     )
                     Text(
-                        text = if (item.second.concluida) "Concluded" else "In Progress...",
+                        text = if (item.second.concluida) "Concluded" else if(item.second.hunter == "None") "Created" else "In Progress...",
                         style = MaterialTheme.typography.bodySmall.copy(),
                         color = if (item.second.concluida) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary
                     )
