@@ -28,7 +28,7 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
     var isFilterDialogOpen by remember { mutableStateOf(false) }
     var sortAscending by remember { mutableStateOf(true) }
     var sortProperty by remember { mutableStateOf("name") }
-    var filterList by remember { mutableStateOf<List<String>>(Bounty.possiblePlanets) }
+    var filterList by remember { mutableStateOf(Bounty.possiblePlanets) }
     var showAvailableOnly by remember { mutableStateOf(false) } // New state for unassigned filter
 
     // Load items from Firebase
@@ -153,7 +153,7 @@ fun BountyListPage(modifier: Modifier = Modifier, navHostController: NavHostCont
                     items(filteredAndSortedItems) { pair ->
                         BountyItem(
                             bounty = pair.second,
-                            onClick = { clickedItem ->
+                            onClick = {
                                 val gson = Gson()
                                 val pairJson = gson.toJson(pair)
                                 navHostController.navigate("bountyDetail/$pairJson")
@@ -350,7 +350,6 @@ fun BountyItem(
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
-
             PlanetImage(bounty)
         }
     }

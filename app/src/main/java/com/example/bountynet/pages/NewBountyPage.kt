@@ -24,7 +24,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.TextFieldDefaults.colors
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -130,21 +129,28 @@ fun CreateBountyPage(
 
             Spacer(modifier = Modifier.height(32.dp))
 
+
+
             // Confirm and Cancel Buttons
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                modifier = Modifier.fillMaxWidth()
+                    .padding (horizontal = 16.dp)
+                    .fillMaxHeight(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Bottom
             ) {
                 // Cancel Button
-                TextButton(
+                Button(
                     onClick = { navController.popBackStack() } // Navigate back
                 ) {
-                    Text("Cancel")
+                    Text(text="Cancel",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSecondary)
                 }
 
-                TextButton(
+                Button(
                     onClick = {
-                        if (loading) return@TextButton // Prevent action if already loading
+                        if (loading) return@Button // Prevent action if already loading
 
                         // Start loading
                         loading = true
@@ -160,7 +166,7 @@ fun CreateBountyPage(
                         errorPlanet = selectedPlanet.isEmpty()
                         errorLat = latitudeValue == null || latitudeValue < -90 || latitudeValue > 90
                         errorLon = longitudeValue == null || longitudeValue < -180 || longitudeValue > 180
-                        var creds = 0
+                        var creds: Int
 
                         if (!errorName && !errorReward && !errorPlanet && !errorLat && !errorLon) {
                             FirebaseHelper.getObjectAttribute(
@@ -223,7 +229,9 @@ fun CreateBountyPage(
                     },
                     enabled = !loading // Disable the button while loading
                 ) {
-                    Text(if (loading) "Creating..." else "Create")
+                    Text(text= if (loading) "Creating..." else "Create",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSecondary)
                 }
 
             }
@@ -456,7 +464,7 @@ fun PlanetSelectionDialog(
     onPlanetSelected: (String) -> Unit,
     onDismissRequest: () -> Unit
 ) {
-    var possiblePlanets = Bounty.possiblePlanets
+    val possiblePlanets = Bounty.possiblePlanets
     Dialog(onDismissRequest = onDismissRequest) {
         Surface(
             modifier = Modifier

@@ -122,7 +122,7 @@ fun Current(
         }
         bounty != null -> {
             if (permissionGranted) {
-                GoogleMapsScreen(modifier,navHostController, bounty!!, userId)
+                GoogleMapsScreen(modifier, navHostController, bounty!!)
             } else {
                 Box(modifier = modifier.fillMaxSize(),) {
                     Text(
@@ -149,8 +149,7 @@ fun Current(
 fun GoogleMapsScreen(
     modifier: Modifier,
     navController: NavHostController,
-    bounty: Bounty,
-    userId: String
+    bounty: Bounty
 ) {
     val context = LocalContext.current
     val fusedLocationProviderClient = remember {
@@ -170,7 +169,7 @@ fun GoogleMapsScreen(
     val currentBackStackEntry = navController.currentBackStackEntry
     val savedLocal = currentBackStackEntry?.savedStateHandle?.get<LatLng?>("startLocation")
 
-    var startLocation = remember { mutableStateOf<LatLng?>(savedLocal)}
+    val startLocation = remember { mutableStateOf<LatLng?>(savedLocal)}
 
     var results by remember { mutableFloatStateOf((0f)) }
     var showButton by remember { mutableStateOf(false) }
@@ -189,7 +188,7 @@ fun GoogleMapsScreen(
                     if (bounty.planeta == "Earth"){
                         cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(latLng, 10f))
                     }
-                    var resu = FloatArray(1)
+                    val resu = FloatArray(1)
                     distanceBetween(location.latitude, location.longitude, destination.latitude, destination.longitude, resu)
                     results = resu[0]
                     showButton = resu[0] <= 100
@@ -214,7 +213,7 @@ fun GoogleMapsScreen(
                     startLocation.value = latLng
                     cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(latLng, 10f))
                 }
-                var resu = FloatArray(1)
+                val resu = FloatArray(1)
                 distanceBetween(location.latitude, location.longitude, destination.latitude, destination.longitude, resu)
                 results = resu[0]
                 showButton = resu[0] <= 100
